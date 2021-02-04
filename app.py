@@ -1,23 +1,14 @@
 from flask import Flask, render_template, url_for, request       # Library Imports
 import pyodbc 
+import pymssql  
 #import pandas as pd
 #import sqlalchemy
 
 app = Flask(__name__)                                # define our application
    
 
-conn = pyodbc.connect(
-    "Driver = {SQL Server Native Client 11.0};"
-    "Server = biservdev.utsarr.net;"
-    "Database = IR_dataRequests;"
-    "UID = fts605;"
-    "PWD = ;"
-    "Trusted_Connection = yes;"
 
-)
-
-
-
+conn = pymssql.connect(server='yourserver.database.windows.net', user='yourusername@yourserver', password='yourpassword', database='AdventureWorks')
 
 
 @app.route('/')                                  # url mapping
