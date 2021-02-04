@@ -6,10 +6,8 @@ import pyodbc
 app = Flask(__name__)                                # define our application
    
 
-
-"""
 conn = pyodbc.connect(
-    "Driver = {};"
+    "Driver = {SQL Server Native Client 11.0};"
     "Server = biservdev.utsarr.net;"
     "Database = IR_dataRequests;"
     "UID = fts605;"
@@ -18,7 +16,6 @@ conn = pyodbc.connect(
 
 )
 
-"""
 
 
 
