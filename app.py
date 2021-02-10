@@ -13,15 +13,21 @@ app = Flask(__name__)                                # define our application
 
 SERVER = '@biservdev.utsarr.net'
 DATABASE = 'IR_dataRequests'
-DRIVER = 'SQL Server Native Client 11.0'
+DRIVER = 'ODBC Driver 17 for SQL Server'
 USERNAME = 'utsarr\fts605'
 PASSWORD = 'Rico99miguel1999_' 	
 
-#engine = create_engine(f'mssql+pyodbc://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}')
-#connection = engine.connect()
+pyodbc.drivers()
 
-cnxn = pyodbc.connect('DRIVER={SQL Server Native Client 11.0};SERVER='+SERVER+';DATABASE='+DATABASE+';UID='+USERNAME+';PWD='+ PASSWORD)
-cursor = cnxn.cursor()
+engine = create_engine(f'mssql+pyodbc://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}')
+connection = engine.connect()
+
+#cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER= '+SERVER+' ;DATABASE='+DATABASE+';UID='+USERNAME+';PWD='+ PASSWORD)
+
+#cnxn = pyodbc.connect('DRIVER={SQL Native Client};SERVER='+SERVER+';DATABASE='+ DATABASE+'; TRUSTED_CONNECTION = yes')
+
+
+#cursor = cnxn.cursor()
 
 
 
