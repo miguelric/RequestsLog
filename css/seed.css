@@ -48,7 +48,8 @@
   background: #0c2340;
   margin-left: 0;
   margin-bottom: 0;
-  padding-left: 1rem;
+  padding-left: 1rem;    
+  text-align:center;
 }
 
 .breadcrumbs {
@@ -57,17 +58,18 @@
   font-size: .75em
 }
 .breadcrumbs span {
-  padding: 0 .2em
+  padding: 0.2em;
 }
 .breadcrumbs a {
-    color: #0c2340
+    color: #0c2340;
 }
 #PageNav li a {
   color: #fff;
+  display: inline;
 }
 
 #PageNav li a:hover {
-    color: #0c2340
+    color: #a6a6a6;
 }
 
 #PageNav li ul li {

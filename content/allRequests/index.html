@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<head>
+	<!--#include file="../../templates/head.html" -->
+	<meta name="description" content="Provide information of annual reports" />
+	<title> Annual Calendar | IR | University of Texas at San Antonio </title>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_dlc_DocId msdt:dt="string">PU6SE53DY3MZ-142871698-1244</mso:_dlc_DocId>
+<mso:_dlc_DocIdItemGuid msdt:dt="string">2e74e444-2ac0-46fc-8d39-856dd69d421d</mso:_dlc_DocIdItemGuid>
+<mso:_dlc_DocIdUrl msdt:dt="string">https://utsacloud.sharepoint.com/sites/vpie/dw_projectAdminSupport/sourceCodeRepository/_layouts/15/DocIdRedir.aspx?ID=PU6SE53DY3MZ-142871698-1244, PU6SE53DY3MZ-142871698-1244</mso:_dlc_DocIdUrl>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+<body>
+	<!--#include file="../../templates/header.html" -->
+
+	<section class="container" id="site-content">
+		<div class="row">
+
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-sm-12" role="main">
+						<!-- begin page content -->
+						<h2>Annual Calendar</h2>
+						<!-- introductory blurb -->
+						<!--<p>Institutional Research and Analysis created a series of interactive custom reports to visualize UTSA data. These reports are a great resource for trend data to answer a variety of data requests. Click on the filters and labels to generate specialized views within each report. Specific definitions and data sources are provided for each indicator in the information section below the graphic.</p> -->
+						<p>Click on the months below to view annual reports.</p>
+						
+						<!-- dropdown 1 -->
+						<ul class="dropdown-tab">
+						<!--	<li id="allID" class="dropdown-list" onClick="droppy('allID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>All</h4>
+							</li> -->
+							<li id="januaryID" class="dropdown-list" onClick="droppy('januaryID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>January</h4>
+							</li>
+							<li id="februaryID" class="dropdown-list" onClick="droppy('februaryID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>February</h4>
+							</li>
+							<li id="marchID" class="dropdown-list" onClick="droppy('marchID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>March</h4>
+							</li>
+							<li id="aprilID" class="dropdown-list" onClick="droppy('aprilID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>April</h4>
+							</li>
+							<li id="mayID" class="dropdown-list" onClick="droppy('mayID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>May</h4>
+							</li>
+							<li id="juneID" class="dropdown-list" onClick="droppy('juneID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>June</h4>
+							</li>
+							<li id="julyID" class="dropdown-list" onClick="droppy('julyID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>July</h4>
+							</li>
+							<li id="augustID" class="dropdown-list" onClick="droppy('augustID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>August</h4>
+							</li>
+							<li id="septemberID" class="dropdown-list" onClick="droppy('septemberID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>September</h4>
+							</li>
+							<li id="octoberID" class="dropdown-list" onClick="droppy('octoberID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>October</h4>
+							</li>
+							<li id="novemberID" class="dropdown-list" onClick="droppy('novemberID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>November</h4>
+							</li>
+							<li id="decemberID" class="dropdown-list" onClick="droppy('decemberID');">
+								<i class="fa fa-chevron-circle-up"></i><h4>December</h4>
+							</li>
+						</ul>
+						<!-- dropdown 2 -->
+						
+						<!-- end page content -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+
+
+	<!-- footer -->
+	<!--#include file="../../templates/footer.html" -->
+	
+	<!-- scripts -->
+	<!--#include file="../../templates/post-footer-scripts.html" -->
+	
+	<!-- page scripts -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="../../js/calendarFilter.js"></script>
+	<script>
+		var filter = createFilter("calendartags.txt", "calendar.json");
+		
+		// the arguments that have the suffix -ID are html id's to grab hold of
+//		filter.getAll("allID");
+		//               ID         ,  tag
+		filter.getByTag("januaryID", "january");
+		filter.getByTag("februaryID", "february");
+		filter.getByTag("marchID", "march");
+		filter.getByTag("aprilID", "april");
+		filter.getByTag("mayID", "may");
+		filter.getByTag("juneID", "june");
+		filter.getByTag("julyID", "july");
+		filter.getByTag("augustID", "august");
+		filter.getByTag("septemberID", "september");
+		filter.getByTag("octoberID", "october");
+		filter.getByTag("novemberID", "november");
+		filter.getByTag("decemberID", "december");
+		
+		function droppy(containerID){
+			// while the container is being animated, the progress function is called repeatedly.
+			$('#' + containerID + '.dropdown-list .dropdown-item-container').slideToggle(
+				{
+					progress: attemptFixFooter,
+					complete: attemptFixFooter
+				}
+			);
+			
+			//icon rotation
+			var icon = $('#' + containerID + '.dropdown-list i');
+			if (icon.hasClass('rotated')){
+				icon.removeClass('rotated');
+				$('#' + containerID + '.dropdown-list i').animate(
+					{rotation: 0},
+					{
+						duration: 500,
+						step: function(now) {
+							$(this).css({ transform: 'rotate(' + now + 'deg)'});
+						}
+					}
+				);
+			}
+			else {
+				icon.addClass('rotated');
+				$('#' + containerID + '.dropdown-list i').animate(
+					{rotation: 180},
+					{
+						duration: 500,
+						step: function(now) {
+							$(this).css({ transform: 'rotate(' + now + 'deg)' });
+						}
+					}
+				);
+			}
+		}
+		
+	</script>
+</body>
+</html>
