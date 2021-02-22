@@ -1,0 +1,44 @@
+/* CSS Document */
+@media print{
+	 #departmentalSocialNav, #site-navigation, #PageNav, #col-navigation, #site-banner, #site-footer i.fa{
+		 display:none;
+	}
+	 .site-top-Title{
+		 font-size: 1.8rem;
+	}
+	 h1{
+		 font-size: 1.6rem 
+	}
+	 h2{
+		 font-size: 1.5rem;
+	}
+	 h3{
+		 font-size: 1.3rem;
+	}
+	 h4, .headerBlock{
+		 font-size: 1.1rem;
+	}
+	 h5, .headerBlock{
+		 font-size: 1.1rem;
+	}
+	 #site-content{
+		 margin-top: 0em;
+	}
+	 #site-footer{
+		 padding-top: 0px !important;
+		 margin-top: 1rem !important;
+		 background-color: #fff !important;
+	}
+	 #site-footer .container .row .col-sm-8{
+		 display:none;
+	}
+	 #site-footer .container .row .col-sm-4 p{
+		 padding-left:0px !important;
+		 margin-top:-1rem !important;
+		 font-size:.85rem;
+	}
+	 #site-footer .container .row .col-sm-4 h5{
+		 font-size: 1rem;
+		 margin-bottom: 1.5rem;
+	}
+}
