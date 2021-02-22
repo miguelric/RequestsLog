@@ -13,26 +13,38 @@ app = Flask(__name__)                                # define our application
 
 SERVER = '@biservdev.utsarr.net'
 DATABASE = 'IR_dataRequests'
-DRIVER = 'ODBC Driver 17 for SQL Server'
-USERNAME = 'utsarr\fts605'
-PASSWORD = 'Rico99miguel1999_' 	
+#DRIVER = 'ODBC Driver 17 for SQL Server'
+#USERNAME = 'utsarr\fts605'
+#PASSWORD = 'Rico99miguel1999_' 	
 
-pyodbc.drivers()
+cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV;""Database=IR_dataRequests;""Trusted_Connection=yes;")
 
-engine = create_engine(f'mssql+pyodbc://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}')
-connection = engine.connect()
-
-#cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER= '+SERVER+' ;DATABASE='+DATABASE+';UID='+USERNAME+';PWD='+ PASSWORD)
-
-#cnxn = pyodbc.connect('DRIVER={SQL Native Client};SERVER='+SERVER+';DATABASE='+ DATABASE+'; TRUSTED_CONNECTION = yes')
-
-
-#cursor = cnxn.cursor()
+cursor = cnxn.cursor()
 
 
 
 
 
+
+
+
+@app.route('/')                                  # url mapping
+def homepage():
+ 
+ 
+    return render_template("index.html")
+
+
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+cursor.execute("SELECT * from") 
+row = cursor.fetchone() 
+while row: 
+    print(row[0])
+    row = cursor.fetchone()
 
 
 
