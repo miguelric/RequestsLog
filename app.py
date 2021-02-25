@@ -4,6 +4,16 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine
 import pandas as pd
 import pyodbc
+import matplotlib.pyplot as plt
+import numpy as np
+
+import io
+import random
+from flask import Response
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
+
 
 
 app = Flask(__name__)                                                # define our application
@@ -34,6 +44,45 @@ uniqueNames = ['Brian Cordeau', 'Ashwin Jayagopal' , 'Fikrewold Bitew', "Jinny C
 numofAnalysts = len(uniqueNames)
 
 print(numofAnalysts)
+
+
+
+
+
+
+
+
+
+
+#plt.show()
+
+def create_figure():
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+  
+    
+
+    uniqueNames = ['Brian', 'Ashwin' , 'Fikrewold', "Jinny", 'Lauren', 'Mahmoud' ,'Salma']
+    energy = [5, 6, 15, 22, 24, 8, 11]
+    x_pos = [i for i, _ in enumerate(uniqueNames)]
+    plt.bar(x_pos, energy, color='green')
+    plt.xticks(x_pos, uniqueNames)
+    plt.xlabel("Analyst")
+    plt.ylabel("Amount of Requests)")
+    plt.title("Requests Table Test")
+
+    axis.bar(uniqueNames, energy)
+    return fig
+
+@app.route('/plot.png')
+def plot_png():
+    fig = create_figure()
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+
 
 
 
