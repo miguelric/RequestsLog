@@ -6,7 +6,6 @@ import pandas as pd
 import pyodbc
 import matplotlib.pyplot as plt
 import numpy as np
-
 import io
 import random
 from flask import Response
@@ -17,7 +16,7 @@ from matplotlib.figure import Figure
 
 
 app = Flask(__name__)                                                # define our application
-   
+"""
 # Connect to DB using pyodbc to get all data into a list
 cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV;""Database=IR_dataRequests;""Trusted_Connection=yes;")
 cursor = cnxn.cursor()
@@ -44,7 +43,7 @@ uniqueNames = ['Brian Cordeau', 'Ashwin Jayagopal' , 'Fikrewold Bitew', "Jinny C
 numofAnalysts = len(uniqueNames)
 
 print(numofAnalysts)
-
+"""
 
 
 
@@ -89,10 +88,10 @@ def plot_png():
 @app.route('/')                                                   # url mapping main page
 def homepage():
 
-    df = uniqueNames
-    db = dic
- 
-    return render_template("index.html", df = df, db = db)
+    #df = uniqueNames
+    #db = dic
+ #, df = df, db = db
+    return render_template("index.html")
 
 
 
