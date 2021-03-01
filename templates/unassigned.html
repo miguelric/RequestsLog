@@ -30,7 +30,7 @@
 	<!--Top Navigation-->
 <h1 id="IR-requests-log-navigation" hidden>Requests Log Navigation Bar</h1>
 <ul id="PageNav">
-	<li>
+    <li>
 		<a href="allRequests"><!--TODO: Add page-->
 		All Requests
 		</a>
@@ -73,52 +73,7 @@
 							<div class="col-sm-12">
 								<div class="col-sm-12 text-sm-center">
 								
-									{% for i in df %}
-       
-      
-									<div class = "person">
-							
-									<pre class = "line">Total Jobs For:      {{i}}   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     </pre>
-							
-									<hr class =  "dottedLine">
-							
-							
-									</div>
-								   
-									{% for x in db %}
-									{% if x[16] == i %}
-								  
-							 
-							
-							
-									<pre class = "rightSec">   {{x[11]}}   </pre>
-							
-									<div class="vl"></div>
-							   
-							   
-							 
-							
-									<pre class = "line">Assigned To:          {{x[16]}}   </pre>
-							
-									<pre class = "line">Job Number:          {{x[1]}}  </pre>
-							
-									<pre class = "line">Requestor:             {{x[4]}}    </pre>
-							
-									<pre class = "line">Priority:                 {{x[17]}}       </pre>
-							
-									<pre class = "line">Due Date:              {{x[3]}}    </pre>
-							
-									<pre class = "line">Days Open:        </pre>
-							
-									<hr class =  "dottedLine">
-							
-							
-								 
-								  
-								
-									{% endif %}
-									{% endfor %}
-									{% endfor %}
+									Unassigned Placeholder
 							
 									
 								</div>

@@ -110,6 +110,38 @@ def allRequests():
     return render_template("allRequests.html", df = df, db = db)
 
 
+
+@app.route('/unassigned')                                                   # url mapping main page
+def unassigned():
+
+    df = uniqueNames
+    db = dic
+ 
+    return render_template("unassigned.html", df = df, db = db)
+
+
+
+
+@app.route('/dueThisWeek')                                                   # url mapping main page
+def dueThisWeek():
+
+    df = uniqueNames
+    db = dic
+ 
+    return render_template("dueThisWeek.html", df = df, db = db)
+
+
+
+
+
+@app.route('/statusUpdate')                                                   # url mapping main page
+def statusUpdate():
+
+    
+    return render_template("statusUpdate.html")
+
+
+
 @app.route('/factbook')                                           # url mapping factbook
 def factbook():
  
