@@ -6,6 +6,7 @@ import pandas as pd
 import pyodbc
 import matplotlib.pyplot as plt
 import numpy as np
+
 import io
 import random
 from flask import Response
@@ -16,7 +17,7 @@ from matplotlib.figure import Figure
 
 
 app = Flask(__name__)                                                # define our application
-"""
+   
 # Connect to DB using pyodbc to get all data into a list
 cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV;""Database=IR_dataRequests;""Trusted_Connection=yes;")
 cursor = cnxn.cursor()
@@ -43,7 +44,7 @@ uniqueNames = ['Brian Cordeau', 'Ashwin Jayagopal' , 'Fikrewold Bitew', "Jinny C
 numofAnalysts = len(uniqueNames)
 
 print(numofAnalysts)
-"""
+
 
 
 
@@ -56,21 +57,29 @@ print(numofAnalysts)
 #plt.show()
 
 def create_figure():
-    fig = Figure()
-    axis = fig.add_subplot(1, 1, 1)
+
+    # Test Data
+    uniqueNames = ['Ashwin', 'Brian', 'Fikrewold', 'Francisco', "Jinny", 'Lauren', 'Mahmoud', 'Peter', 'Scott', 'Shanna']
+    total =     [5, 6, 15, 22, 24, 8, 11, 1, 4, 2]
+    thisWeek =  [1, 2, 7, 9, 6, 2, 4, 0, 1, 0]
+
+
+    #Creating Graph
+    fig = plt.figure(figsize=(15,5))
+    axis = fig.add_subplot(111)
   
+    axis.bar(uniqueNames, total, color='#ff8c00', label = 'Total Requests', width = .7, linewidth = .6, edgecolor = 'black') #orange
+    axis.bar(uniqueNames, thisWeek, color='#002fa7', label = 'Requests this Week', width = .7, linewidth = .6, edgecolor = 'black') #navy
+
+    axis.set_xlabel("")
+    axis.set_ylabel("Amount of Requests")
+
+    axis.spines['right'].set_visible(False)
+    axis.spines['top'].set_visible(False)
+    axis.tick_params(bottom=False)   
+
+    axis.legend(frameon = False)
     
-
-    uniqueNames = ['Brian', 'Ashwin' , 'Fikrewold', "Jinny", 'Lauren', 'Mahmoud' ,'Salma']
-    energy = [5, 6, 15, 22, 24, 8, 11]
-    x_pos = [i for i, _ in enumerate(uniqueNames)]
-    plt.bar(x_pos, energy, color='green')
-    plt.xticks(x_pos, uniqueNames)
-    plt.xlabel("Analyst")
-    plt.ylabel("Amount of Requests)")
-    plt.title("Requests Table Test")
-
-    axis.bar(uniqueNames, energy)
     return fig
 
 @app.route('/plot.png')
@@ -83,16 +92,22 @@ def plot_png():
 
 
 
-
-
 @app.route('/')                                                   # url mapping main page
 def homepage():
 
-    #df = uniqueNames
-    #db = dic
- #, df = df, db = db
-    return render_template("index.html")
+    df = uniqueNames
+    db = dic
+ 
+    return render_template("index.html", df = df, db = db)
 
+
+@app.route('/allRequests')                                                   # url mapping main page
+def allRequests():
+
+    df = uniqueNames
+    db = dic
+ 
+    return render_template("allRequests.html", df = df, db = db)
 
 
 @app.route('/factbook')                                           # url mapping factbook
