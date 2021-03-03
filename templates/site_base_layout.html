@@ -3,18 +3,12 @@
 
 <head>
 	<!--#include file="templates/head.html" -->
-	<meta name="Portal Home" content="IR Requests Log Portal Site">
-	<title>OIR Data Requests Home | UTSA | University of Texas at San Antonio</title>
+	<meta name="OIR Requests Portal" content="IR Requests Log Portal Site">
+	<title>OIR Data Requests - {% block title %}{% endblock %} | UTSA | University of Texas at San Antonio</title>
 
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/global.min.css'   )}}">
 	<link rel="stylesheet" type="text/css" media="print" href="{{ url_for('static', filename = 'css/print.css'   )}}">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/site.css'   )}}">
-	<!-- 
-	<link href="css/global.min.css" rel="stylesheet" type="text/css" />
-	<link href="css/print.css"  rel="stylesheet" type="text/css" />
-	<link href="css/site.css" rel="stylesheet" type="text/css"/>
--->
-	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 </head>
 
 <!--Top Navigation-->

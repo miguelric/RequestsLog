@@ -1,5 +1,7 @@
 {% extends "site_base_layout.html" %}
 
+{% block title %}Home{% endblock %}
+
 {% block head %}
 {{ super() }}
 {% endblock %}
@@ -10,6 +12,7 @@
 	<image src="{{ url_for('static', filename = 'images/rowdy.png'   )}}" width=10% href="/">
 		<div class="col-sm-12">
 			<h1>UTSA OIR Data Requests</h1>
+			<p>Description placeholder</p>
 		</div>
 		<div class="col-sm-12">
 			<div class="col-sm-12 text-sm-center">
@@ -19,4 +22,4 @@
 		</div>
 </div>
 <!-- end page content -->
-{ % endblock %}
+{% endblock %}
