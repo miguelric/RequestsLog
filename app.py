@@ -12,8 +12,18 @@ import random
 from flask import Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
+import datetime
 
+startDate = '2018/10/01'
+endDate = '2019/10/01'
+if datetime.date.today().isoweekday() == 1:
+    print("it is monday and the date is")
 
+    startDate = datetime.date.today()
+    endDate = startDate + datetime.timedelta(6)
+  
+print(startDate)
+print(endDate)
 
 
 app = Flask(__name__)                                                # define our application
@@ -21,7 +31,23 @@ app = Flask(__name__)                                                # define ou
 # Connect to DB using pyodbc to get all data into a list
 cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV;""Database=IR_dataRequests;""Trusted_Connection=yes;")
 cursor = cnxn.cursor()
-cursor.execute("SELECT * FROM dbo.requests")
+#cursor.execute("SELECT * FROM dbo.requests")
+
+# Fetch ALL requests that are open
+#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Open';")
+
+
+
+#Fetch ALL requests that are open this WEEK
+
+cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND dueDate >= '"+ startDate + "' and dueDate <= '"+ endDate +"'")
+
+
+
+
+#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+
+
 
 dic = []
 for row in cursor.fetchall():
