@@ -54,6 +54,8 @@ for row in cursor.fetchall():
     dic.append(row)
 
 
+#print(dic)
+
 
 # Connect to DB using SQLAlchem in order to use Pandas
 engine = sa.create_engine('mssql+pyodbc://BISERVDEV/IR_dataRequests?driver=SQL Server Native Client 11.0?Trusted_Connection=yes').connect()
@@ -121,7 +123,9 @@ def plot_png():
 @app.route('/')                                                   # url mapping main page
 def homepage():
 
+    # DataFrame for analyst names
     df = uniqueNames
+    # Stores information of every row in database
     db = dic
  
     return render_template("index.html", df = df, db = db)

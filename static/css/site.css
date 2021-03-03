@@ -21,8 +21,6 @@ body {
 		 cursor: pointer;
 		 text-align: center;
 	}
-	.dropdown-list ul {
-	}
 }
 @media (max-width: 625px) { 
 	.site-top-Title .web{
