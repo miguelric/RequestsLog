@@ -1,95 +1,22 @@
-<!DOCTYPE html>
-<html>
+{% extends "site_base_layout.html" %}
 
-<head>
-	<!--#include file="templates/head.html" -->
-	<meta name="Portal Home" content="IR Requests Log Portal Site">
-	<title>OIR Data Requests Home | UTSA | University of Texas at San Antonio</title>
+{% block head %}
+{{ super() }}
+{% endblock %}
 
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/global.min.css'   )}}">
-	<link rel="stylesheet" type="text/css" media="print" href="{{ url_for('static', filename = 'css/print.css'   )}}">
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/site.css'   )}}">
-	<!-- 
-	<link href="css/global.min.css" rel="stylesheet" type="text/css" />
-	<link href="css/print.css"  rel="stylesheet" type="text/css" />
-	<link href="css/site.css" rel="stylesheet" type="text/css"/>
--->
-	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-
-</head>
-
-<body>
-	<!-- header -->
-	<!--#include file="templates/header.html" -->
-	<div id="header-placeholder">
-	</div>
-
-	<!--#include file="templates/site-top-navigation.html" -->
-	<!-- navigation bar -->
-	<div id="nav-placeholder">
-	</div>
-	<!--Top Navigation-->
-	<h1 id="IR-requests-log-navigation" hidden>Requests Log Navigation Bar</h1>
-	<ul id="PageNav">
-		<li>
-			<a href="allRequests">
-				<!--TODO: Add page-->
-				All Requests
-			</a>
-		</li>
-		<li>
-			<a href="unassigned">
-				<!--TODO: Add page i.e. ../content/somepage-->
-				Unassigned Requests
-			</a>
-		</li>
-		<li>
-			<a href="dueThisWeek">
-				<!--TODO: Add page i.e. ../content/somepage-->
-				Due this Week
-			</a>
-		</li>
-		<li>
-			<a href="statusUpdate">
-				<!--TODO: Add page i.e. ../content/somepage-->
-				Status Update
-			</a>
-		</li>
-	</ul>
-	<html xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
-
-	<head>
-	</head>
-
-	<section class="container" id="site-content">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="row">
-					<div class="col-sm-12" role="main">
-						<!-- begin page content -->
-						<div class="row">
-							<image src="{{ url_for('static', filename = 'images/rowdy.png'   )}}" width=10% href="/">
-								<div class="col-sm-12">
-									<h1>UTSA OIR Data Requests</h1>
-								</div>
-								<div class="col-sm-12">
-									<div class="col-sm-12 text-sm-center">
-										<p>Open Requests by Analyst</p>
-										<img src="/plot.png" alt="Requests Table">
-									</div>
-								</div>
-						</div>
-						<!-- end page content -->
-					</div>
-				</div>
-				<div class="row">
-				</div>
+{% block content %}
+<!-- begin page content -->
+<div class="row">
+	<image src="{{ url_for('static', filename = 'images/rowdy.png'   )}}" width=10% href="/">
+		<div class="col-sm-12">
+			<h1>UTSA OIR Data Requests</h1>
+		</div>
+		<div class="col-sm-12">
+			<div class="col-sm-12 text-sm-center">
+				<p>Open Requests by Analyst</p>
+				<img src="/plot.png" alt="Requests Table">
 			</div>
 		</div>
-	</section>
-
-	<!-- footer -->
-	<!--#include file="templates/footer.html" -->
-</body>
-
-</html>
+</div>
+<!-- end page content -->
+{ % endblock %}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!--#include file="templates/head.html" -->
+	<meta name="Portal Home" content="IR Requests Log Portal Site">
+	<title>OIR Data Requests Home | UTSA | University of Texas at San Antonio</title>
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/global.min.css'   )}}">
+	<link rel="stylesheet" type="text/css" media="print" href="{{ url_for('static', filename = 'css/print.css'   )}}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/site.css'   )}}">
+	<!-- 
+	<link href="css/global.min.css" rel="stylesheet" type="text/css" />
+	<link href="css/print.css"  rel="stylesheet" type="text/css" />
+	<link href="css/site.css" rel="stylesheet" type="text/css"/>
+-->
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+
+<!--Top Navigation-->
+<h1 id="IR-requests-log-navigation" hidden>Requests Log Navigation Bar</h1>
+<ul id="PageNav">
+	<li>
+		<a href="allRequests">
+			All Requests
+		</a>
+	</li>
+	<li>
+		<a href="unassigned">
+			Unassigned Requests
+		</a>
+	</li>
+	<li>
+		<a href="dueThisWeek">
+			Due this Week
+		</a>
+	</li>
+	<li>
+		<a href="statusUpdate">
+			Status Update
+		</a>
+	</li>
+</ul>
+
+<body>
+	<section class="container" id="site-content">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-sm-12" role="main">
+						{% block content %}
+						{% endblock %}
+					</div>
+				</div>
+				<div class="row">
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>
+
+<html xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+
+</html>
