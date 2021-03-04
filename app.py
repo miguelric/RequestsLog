@@ -33,19 +33,10 @@ cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV
 cursor = cnxn.cursor()
 #cursor.execute("SELECT * FROM dbo.requests")
 
-# Fetch ALL requests that are open
-#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Open';")
 
 
-
-#Fetch ALL requests that are open this WEEK
-
-cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND dueDate >= '"+ startDate + "' and dueDate <= '"+ endDate +"'")
-
-
-
-
-#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+# Fetch ALL requests that are open (allRequests.html)
+cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
 
 
 
@@ -54,7 +45,25 @@ for row in cursor.fetchall():
     dic.append(row)
 
 
-#print(dic)
+
+
+#Fetch ALL requests that are open this WEEK (dueThisWeek.html)
+cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND dueDate >= '"+ startDate + "' and dueDate <= '"+ endDate +"'")
+
+
+thisWeekDict = []
+for row in cursor.fetchall():
+    thisWeekDict.append(row)
+
+#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Open' AND WHERE A;")
+
+
+
+
+
+
+
+
 
 
 # Connect to DB using SQLAlchem in order to use Pandas
@@ -123,9 +132,7 @@ def plot_png():
 @app.route('/')                                                   # url mapping main page
 def homepage():
 
-    # DataFrame for analyst names
     df = uniqueNames
-    # Stores information of every row in database
     db = dic
  
     return render_template("index.html", df = df, db = db)
@@ -156,7 +163,7 @@ def unassigned():
 def dueThisWeek():
 
     df = uniqueNames
-    db = dic
+    db = thisWeekDict
  
     return render_template("dueThisWeek.html", df = df, db = db)
 
@@ -169,13 +176,6 @@ def statusUpdate():
 
     
     return render_template("statusUpdate.html")
-
-
-
-@app.route('/factbook')                                           # url mapping factbook
-def factbook():
- 
-    return render_template("factbook_dashboard_ref.html")
 
 
 
