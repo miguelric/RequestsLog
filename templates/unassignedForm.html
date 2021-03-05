@@ -1,0 +1,55 @@
+{% extends "site_base_layout.html" %}
+
+{% block title %}Unassigned{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<!-- begin page content -->
+<div class="row">
+
+    <a href="/">
+        <image src="{{ url_for('static', filename = 'images/rowdy.png'   )}}" width=10%>
+
+    </a>
+    <div class="col-sm-12">
+        <h1>UTSA OIR Data Requests</h1>
+        <p>Description placeholder</p>
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-12 text-sm-left">
+            <p>The Form ID is: {{formID}}</p>
+            {% for x in db %}
+            {% if x[1] == formID %}
+            <!--Specify that the form should post its data
+            to the /update route. We will also prepopulate the data.-->
+            <form method="POST" action="./update">
+                <input type="hidden" value="{{formID}}" name="formID">
+                <section>
+                    <label for="requestor">Requestor:</label><input type="text" id="requestor" value="{{x[4]}}"
+                        readonly>
+                </section>
+                <br>
+                <label for="description">Description:</label><textarea id="description" readonly>{{x[11]}}</textarea>
+                <br>
+                <label for="priority">Priority:</label><input type="text" id="requestor" value="{{x[17]}}" readonly>
+                <br>
+                <label for="duedate">Due Date:</label><input type="text" id="duedate" value="{{x[3]}}" readonly>
+                <br>
+
+                <label for="assignanalyst">Assign analyst:</label><input type="text" id="assignanalyst"
+                    value="{{x[16]}}" name="newAssignedAnalyst">
+
+                <br>
+                <input type="submit" value="Update">
+            </form>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</div>
+<!-- end page content -->
+{% endblock %}
