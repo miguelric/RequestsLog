@@ -22,28 +22,6 @@
 		<div class="col-sm-12 text-sm-center">
 			{% for x in db %}
 			{% if x[16] == None %}
-			<!--<pre class="rightSec">   {{x[11]}}   </pre>
-
-				<div class="vl"></div>
-
-
-
-
-				<pre class="line">Assigned To:          {{x[16]}}   </pre>
-
-				<pre class="line">Job Number:          {{x[1]}}  </pre>
-
-				<pre class="line">Requestor:             {{x[4]}}    </pre>
-
-				<pre class="line">Priority:                 {{x[17]}}       </pre>
-
-				<pre class="line">Due Date:              {{x[3]}}    </pre>
-
-				<pre class="line">Days Open:        </pre>
-
-				<hr class="dottedLine">-->
-
-
 			<div id="accordion-{{ loop.index }}" role="tablist">
 				<div class="card">
 					<div class="card-header" role="tab" id="heading-{{ loop.index }}">
@@ -64,6 +42,15 @@
 							Priority: {{x[17]}}<br>
 							Due Date: {{x[3]}}<br>
 							Days Open: <br>
+
+							<script type="text/javascript">
+								function showForm(unassignedID) {
+									window.location = 'unassignedForm?form=' + unassignedID;
+								}
+							</script>
+
+							<input type="button" name="theButton" value="Edit Form and Assign Analyst"
+								onclick="showForm('{{x[1]}}');">
 						</div>
 					</div>
 				</div>

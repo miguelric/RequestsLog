@@ -2,6 +2,13 @@
 from flask import Flask, render_template, url_for, request           # Library Imports
 import sqlalchemy as sa
 from sqlalchemy import create_engine
+### New imports ###
+from sqlalchemy import Column, String
+from sqlalchemy.orm import Session, sessionmaker, mapper
+from flask import redirect
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.automap import automap_base
+######
 import pandas as pd
 import pyodbc
 import matplotlib.pyplot as plt
@@ -59,13 +66,6 @@ for row in cursor.fetchall():
 
 
 
-
-
-
-
-
-
-
 # Connect to DB using SQLAlchem in order to use Pandas
 engine = sa.create_engine('mssql+pyodbc://BISERVDEV/IR_dataRequests?driver=SQL Server Native Client 11.0?Trusted_Connection=yes').connect()
 
@@ -84,6 +84,57 @@ print(numofAnalysts)
 
 
 
+# Note: testing SQLAlchemy ORM to make CRUD forms
+#########################################
+# create the Session class using sessionmaker.
+# Alternatively, you can create a session using session = Session(bind=engine),
+# but you would have to create it everytime you want to communicate with db.
+# With sessionmaker (global scope), you can use session = Session() w/o arguments
+# to instantiate the session as many times as you need.
+# Remember: session = Session() everytime.
+Session = sessionmaker(bind=engine)
+    
+#Base = declarative_base()
+#Base.metadata.reflect(bind=engine)
+Base = automap_base()
+
+class db_table(Base): 
+#    __table__ = Base.metadata.tables['requests']
+    __tablename__ = 'requests'
+    requestId = Column(String, primary_key=True)
+
+    
+Base.prepare(engine, reflect=True)
+
+session = Session()
+
+# To update an object simply set its attribute to a new value, add the object 
+# to the session and commit the changes.
+# Example:
+# i = session.query(Item).get(8) where 8 is the primary key
+# i.selling_price = 25.91
+# session.add(i)
+# session.commit()
+@app.route("/update", methods=["POST"])
+def update():
+    newAssignedAnalyst = request.form.get("newAssignedAnalyst")
+    formID = request.form.get("formID")
+    
+    # Will print the raw SQL expression for querying database
+    #print(session.query(db_table))
+    
+    # Find the record in the database matching the request ID
+    ### Update permissions??? ###
+    #session.query(db_table).filter(db_table.requestId == 'formID').update({'assignedTo': newAssignedAnalyst})
+    
+    # Not best for now but these lines WILL modify the object but modifications will only hit databse when you flush changes from session
+    #record = session.query(db_table).filter(db_table.requestId == 'formID')
+    #record.assignedTo = newAssignedAnalyst
+    
+    #session.commit()
+    return redirect("/unassigned")
+
+#########################################
 
 
 
@@ -156,6 +207,15 @@ def unassigned():
  
     return render_template("unassigned.html", df = df, db = db)
 
+
+@app.route('/unassignedForm')                                                   # url mapping main page
+def unassignedForm():
+
+    df = uniqueNames
+    db = dic
+    formID = request.args.get('form')
+ 
+    return render_template("unassignedForm.html", df = df, db = db, formID = formID)
 
 
 
