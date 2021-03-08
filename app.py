@@ -31,6 +31,8 @@ if datetime.date.today().isoweekday() == 1:
   
 print(startDate)
 print(endDate)
+startDate = startDate.strftime("%Y-%m-%d")
+endDate = endDate.strftime("%Y-%m-%d")
 
 
 app = Flask(__name__)                                                # define our application
