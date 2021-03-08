@@ -28,11 +28,15 @@ if datetime.date.today().isoweekday() == 1:
 
     startDate = datetime.date.today()
     endDate = startDate + datetime.timedelta(6)
+    nextWeek = endDate + datetime.timedelta(6)
+
   
 print(startDate)
 print(endDate)
+print(nextWeek)
 startDate = startDate.strftime("%Y-%m-%d")
 endDate = endDate.strftime("%Y-%m-%d")
+nextWeek = nextWeek.strftime("%Y-%m-%d")
 
 
 app = Flask(__name__)                                                # define our application
@@ -79,10 +83,56 @@ temp = pd.DataFrame(temp)
 
 
 uniqueNames =  temp['assignedTo'].unique()                         # Find unique analyst names (currently doesnt work bc of extra analyst names in db)
-uniqueNames = ['Brian Cordeau', 'Ashwin Jayagopal' , 'Fikrewold Bitew', "Jinny Case", 'Lauren Apgar', 'Mahmoud Abunawas' ,'Salma Ferdous']
+uniqueNames = ['Ashwin Jayagopal', 'Brian Cordeau', 'Fikrewold Bitew', 'Francisco Benavides', "Jinny Case", 'Lauren Apgar', 'Mahmoud Abunawas', 'Peter Nguyen', 'Scott Lehrman', 'Shanna Sherwood']
 numofAnalysts = len(uniqueNames)
 
-print(numofAnalysts)
+
+
+#weekly = temp[temp['dueDate'].between(startDate, endDate)]                 # Use after database is updated
+#weekly = temp[temp['dueDate'].between('2010-04-12', '2018-06-12')]
+
+
+# Obtain how many tasks this week , next week and later on for each analyst
+myDict = {}
+
+for x in uniqueNames:
+    
+    tasks = []
+    analyst = temp.loc[temp['assignedTo'] == x]
+    total = len(analyst)
+
+    week = analyst.loc[analyst['dueDate'].between('2010-04-12', '2018-06-12', inclusive=False)]
+    tasks.append(len(week))
+    nextWeek = analyst.loc[analyst['dueDate'].between('2018-06-12', '2019-06-12', inclusive=False)]
+    tasks.append(len(nextWeek))
+    tasks.append(total - tasks[0]- tasks[1])
+    myDict[x] = tasks
+
+
+
+
+"""
+for x in uniqueNames:
+      
+    tasks = []
+    analyst = temp.loc[temp['assignedTo'] == x]
+    total = len(analyst)
+
+    week = analyst.loc[analyst['dueDate'].between(startDate, endDate, inclusive=False)]
+    tasks.append(len(week))
+    nextWeek = analyst.loc[analyst['dueDate'].between(endDate, nextWeek, inclusive=False)]
+    tasks.append(len(nextWeek))
+    tasks.append(total - tasks[0]- tasks[1])
+    myDict[x] = tasks
+
+print(myDict)
+"""
+
+
+
+
+
+#print(weekly)
 
 
 
@@ -145,7 +195,7 @@ def update():
 
 
 #plt.show()
-
+"""
 def create_figure():
 
     # Test Data
@@ -171,13 +221,53 @@ def create_figure():
     axis.legend(frameon = False)
     
     return fig
+"""
+
+# CHANGE THIS TO CHANGE GRAPH TO SPECIFIC ANALYST
+chosenAnalyst = uniqueNames[4]
+
+def testFig(x):
+    print(myDict)
+    # Test Data
+    names = ['This Week', 'Next Week', 'Other']
+    analyst = x
+    values =  myDict[analyst]
+
+
+    #Creating Graph
+    fig = plt.figure(figsize=(15,5))
+    axis = fig.add_subplot(111)
+  
+    axis.bar(names, values, color='#ff8c00', label = 'Total Requests', width = .7, linewidth = .6, edgecolor = 'black') #orange
+
+    axis.set_xlabel("")
+    axis.set_ylabel("Amount of Requests")
+
+    axis.spines['right'].set_visible(False)
+    axis.spines['top'].set_visible(False)
+    axis.tick_params(bottom=False)   
+    axis.set_title('Requests for ' + analyst)
+
+    
+    return fig
+
+
+
+
+
 
 @app.route('/plot.png')
 def plot_png():
-    fig = create_figure()
+    #fig = create_figure()
+    fig = testFig(chosenAnalyst)
+
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
+
+
+
+
 
 
 
