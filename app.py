@@ -136,7 +136,10 @@ print(myDict)
 
 
 
-# Note: testing SQLAlchemy ORM to make CRUD forms
+
+
+
+# Using SQLAlchemy ORM
 #########################################
 # create the Session class using sessionmaker.
 # Alternatively, you can create a session using session = Session(bind=engine),
@@ -144,10 +147,8 @@ print(myDict)
 # With sessionmaker (global scope), you can use session = Session() w/o arguments
 # to instantiate the session as many times as you need.
 # Remember: session = Session() everytime.
+
 Session = sessionmaker(bind=engine)
-    
-#Base = declarative_base()
-#Base.metadata.reflect(bind=engine)
 Base = automap_base()
 
 class db_table(Base): 
@@ -155,35 +156,30 @@ class db_table(Base):
     __tablename__ = 'requests'
     requestId = Column(String, primary_key=True)
 
-    
 Base.prepare(engine, reflect=True)
-
 session = Session()
 
-# To update an object simply set its attribute to a new value, add the object 
-# to the session and commit the changes.
-# Example:
-# i = session.query(Item).get(8) where 8 is the primary key
-# i.selling_price = 25.91
-# session.add(i)
-# session.commit()
+
+# update the assigned analyst - routed from unassignedForm.html
 @app.route("/update", methods=["POST"])
 def update():
     newAssignedAnalyst = request.form.get("newAssignedAnalyst")
     formID = request.form.get("formID")
-    
+
     # Will print the raw SQL expression for querying database
     #print(session.query(db_table))
     
     # Find the record in the database matching the request ID
-    ### Update permissions??? ###
+
+    # Unexpected behavior?
     #session.query(db_table).filter(db_table.requestId == 'formID').update({'assignedTo': newAssignedAnalyst})
     
-    # Not best for now but these lines WILL modify the object but modifications will only hit databse when you flush changes from session
-    #record = session.query(db_table).filter(db_table.requestId == 'formID')
-    #record.assignedTo = newAssignedAnalyst
+
+    record = session.query(db_table).filter_by(requestId = formID).one()
+    record.assignedTo = newAssignedAnalyst
+    session.add(record)
+    session.commit()
     
-    #session.commit()
     return redirect("/unassigned")
 
 #########################################
@@ -275,6 +271,16 @@ def plot_png():
 @app.route('/')                                                   # url mapping main page
 def homepage():
 
+    # With the database being updated from within this app, as well as any queries/updates/deletes/adds that
+    # happen through SSMS or other clients, it is safer to re-fetch the database on page load.
+    # Re-fetch ALL requests that are open (allRequests.html)
+    dic = []
+    for row in cursor.fetchall():
+        dic.append(row)
+
+    df = uniqueNames
+    db = dic
+
     df = uniqueNames
     db = dic
  
@@ -283,6 +289,12 @@ def homepage():
 
 @app.route('/allRequests')                                                   # url mapping main page
 def allRequests():
+
+    # Re-fetch ALL requests that are open (allRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    dic = []
+    for row in cursor.fetchall():
+        dic.append(row)
 
     df = uniqueNames
     db = dic
@@ -294,6 +306,12 @@ def allRequests():
 @app.route('/unassigned')                                                   # url mapping main page
 def unassigned():
 
+    # Re-fetch ALL requests that are open (allRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    dic = []
+    for row in cursor.fetchall():
+        dic.append(row)
+
     df = uniqueNames
     db = dic
  
@@ -302,6 +320,12 @@ def unassigned():
 
 @app.route('/unassignedForm')                                                   # url mapping main page
 def unassignedForm():
+
+    # Re-fetch ALL requests that are open (allRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    dic = []
+    for row in cursor.fetchall():
+        dic.append(row)
 
     df = uniqueNames
     db = dic
@@ -313,6 +337,12 @@ def unassignedForm():
 
 @app.route('/dueThisWeek')                                                   # url mapping main page
 def dueThisWeek():
+
+    # Re-fetch ALL requests that are open (allRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    dic = []
+    for row in cursor.fetchall():
+        dic.append(row)
 
     df = uniqueNames
     db = thisWeekDict
@@ -326,6 +356,11 @@ def dueThisWeek():
 @app.route('/statusUpdate')                                                   # url mapping main page
 def statusUpdate():
 
+    # Re-fetch ALL requests that are open (allRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    dic = []
+    for row in cursor.fetchall():
+        dic.append(row)
     
     return render_template("statusUpdate.html")
 
