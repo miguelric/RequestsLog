@@ -1,0 +1,222 @@
+/* CSS Document */
+html {
+	scroll-behavior: smooth;
+}
+body {
+	padding: none;
+	margin: none;
+}
+@media (max-width: 625px) {
+	.site-top-Title .mobile{
+		 font-weight: 700;
+		 margin: .1em 0 .1em;
+		 display: block;
+		 font-family: inherit;
+		 line-height: 1.1;
+		 font-size: 2.75rem;
+		 text-rendering: optimizelegibility;
+		 background-color: #FFF;
+		 box-sizing: border-box;
+		 color: #0c2340;
+		 cursor: pointer;
+		 text-align: center;
+	}
+}
+@media (max-width: 625px) { 
+	.site-top-Title .web{
+		 display: none; 
+	}
+}
+@media (min-width: 626px) { 
+	.site-top-Title .mobile{
+		 display: none; 
+	}
+}
+@media (min-width: 626px) { 
+	.site-top-Title .web{
+		 font-weight: 700;
+		 margin: .3em 0 .1em;
+		 display: block;
+		 font-family: inherit;
+		 line-height: 1.1;
+		 font-size: 2.75rem;
+		 text-rendering: optimizelegibility;
+		 background-color: #FFF;
+		 box-sizing: border-box;
+		 color: #0c2340;
+		 cursor: pointer;
+	}
+}
+ .site-top-Title a:hover {
+	 color: #0c2340;
+}
+ .site-top-Title a {
+	 color: #0c2340;
+}
+ #site-top, #site-content {
+	 margin-top: 2em;
+}
+ .site-top-Title {
+	 float: left;
+	 width: auto;
+	 margin-bottom: 5px;
+}
+ .site-top-Title-img {
+	 float: left;
+	 width: 77;
+	 padding-right: 0.75rem;
+}
+ .site-footer {
+	 background-color: #eee; 
+	 padding: 1em 0 0 0;
+}
+.site-footer-fixedToBottom {
+	 position: fixed;
+	 width: 100vw;
+	 bottom: 0px;
+}
+ .content-caption {
+	 font-size: 0.75rem;
+}
+ #PageNav {
+	 vertical-align: center; 
+	 background: #d9d9d9;
+	 margin: 0;
+	 text-align: center;
+	 position: relative;
+}
+ .breadcrumbs {
+	 padding-top: .9em;
+	 padding-bottom: 0.45em;
+	 font-size: .75em;
+}
+ .breadcrumbs span {
+	 padding: 0.2em;
+}
+ .breadcrumbs a {
+	 color: #0c2340 
+}
+ #PageNav li {
+	 vertical-align: center; 
+	 display: inline-flex;
+	 margin: 0;
+	 position: relative;
+	 color: #fff;
+	 padding: 5px 10px;
+	 cursor: default	 
+}
+
+#PageNav li:nth-child(2n+1) a {
+   background-color: #0c2340;
+}
+
+#PageNav li:nth-child(2n+2) a {
+   background-color: #D14905;
+}
+
+ #PageNav li a {
+	 border-bottom: none;
+	 color: #fff;
+	 padding: 8px;
+}
+ #PageNav li a:hover {
+	 color: #D9D9D9;
+}
+ .btn {
+	 padding: .7rem;
+}
+ a.button {
+	 display: inline;
+	 background-color:#F2D3B4; 
+	 font-size: 25px; 
+	 padding: 2px 5px;
+	 border: 5px;
+	 border-style: solid; 
+	 border-color: #f47321;
+	 border-width: 0;
+	 margin: 0px 5px 5px 0px;
+	 box-shadow: 0px 2px 5px #555555;
+	 -webkit-transition: all 0.2s cubic-bezier(0, 0.5, 0.5, 1); /* Safari 4.0 - 8.0 */
+	 -webkit-transition-property: box-shadow, color;
+  	 transition: all 0.2s cubic-bezier(0, 0.5, 0.5, 1);
+	 transition-property: box-shadow, color;
+}
+ a.button:hover {
+	 box-shadow: none;
+	 color: #f47321;
+}
+/***** styles for dropdowns ****/
+.dropdown-tab{
+	padding: 0;
+}
+.dropdown-list{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border-top: 1px solid #818181;
+	cursor: pointer;
+}
+.dropdown-list h4{
+	font-size: 22px;
+	display: inline;
+	margin: 0 0 0 5px;
+	padding: 0 0 0 0;
+}
+.dropdown-list:enabled{
+	color: white;
+}
+.dropdown-list div {
+	display: block;
+	padding: 0px 0px 0px 0px;
+	margin: 0;
+	text-decoration: none;
+	list-style: none;
+	background-color:#D7D7D7
+}
+.dropdown-list section {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.dropdown-list div:nth-child(odd){
+	background-color:#E0E0E0;
+}
+.dropdown-list div h5{
+	font-size: 20px;
+	color: black;
+	margin: 0;
+	padding: 0;
+}
+.dropdown-list div p{
+	margin: 0;
+	padding: 0;
+}
+.dropdown-list a{
+	color:#5e5e5e
+}
+.dropdown-list a:hover{
+	color:#131313
+}
+.dropdown-list div:hover{
+	background-color:#EEEEEE
+}
+.dropdown-item-container{
+	display: none;
+}
+/******* dashboards dropdown img *****/
+.dropdown-thumbnail {
+	width: 110px;
+	height: 110px;
+	border: 5px solid #CCCCCC; 
+	text-align: center;
+	object-fit: cover;
+	float: right;
+	margin: 5px 0px 5px 0px;
+}
+
+/* bootstrap extensions */
+.embed-responsive-55by34{
+	padding-top: 61.81%;
+}
+.embed-responsive-temp{
+	padding-top: 50%;
+}

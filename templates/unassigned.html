@@ -19,7 +19,7 @@
 		<p>Unassigned Requests</p>
 	</div>
 	<div class="col-sm-12">
-		<div class="col-sm-12 text-sm-center">
+		<div class="col-sm-12 text-sm-left">
 			{% for x in db %}
 			{% if x[16] == None %}
 			<div id="accordion-{{ loop.index }}" role="tablist">
@@ -28,7 +28,14 @@
 						<h5 class="mb-0">
 							<a data-toggle="collapse" href="#collapse-{{ loop.index }}" aria-expanded="true"
 								aria-controls="collapse-{{ loop.index }}">
-								Task #{{ x[1] }} - Assigned to {{ x[16] }}
+								<!--For fetching rqstTitle-->
+								{% if x[13] != None %}
+								{{x[13]}}
+								{% endif %}
+								<!--If rqstTitle null, fetch rqstURL-->
+								{% if x[13] == None %}
+								{{x[10]}}
+								{% endif %}
 							</a>
 						</h5>
 					</div>
@@ -38,10 +45,11 @@
 						<div class="card-body">
 							{{x[11]}}<br><br>
 
+							Request ID: {{ x[1] }}<br>
 							Requestor: {{x[4]}}<br>
 							Priority: {{x[17]}}<br>
 							Due Date: {{x[3]}}<br>
-							Days Open: <br>
+							Days Open: <br><br>
 
 							<script type="text/javascript">
 								function showForm(unassignedID) {
