@@ -165,6 +165,7 @@ session = Session()
 def update():
     newAssignedAnalyst = request.form.get("newAssignedAnalyst")
     formID = request.form.get("formID")
+    print(formID)
 
     # Will print the raw SQL expression for querying database
     #print(session.query(db_table))

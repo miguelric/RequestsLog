@@ -16,38 +16,112 @@
     </a>
     <div class="col-sm-12">
         <h1>UTSA OIR Data Requests</h1>
-        <p>Unassigned Requests</p>
+        <p>Some description here</p>
     </div>
-    <div class="col-sm-12">
-        <div class="col-sm-12 text-sm-left">
-            <p>The Form ID is: {{formID}}</p>
-            {% for x in db %}
-            {% if x[1] == formID %}
-            <!--Specify that the form should post its data
+    {% for x in db %}
+    {% if x[1] == formID %}
+    <!--Specify that the form should post its data
             to the /update route. We will also prepopulate the data.-->
-        <div class = "unassignedContainer">
-            <form method="POST" action="./update">
-                <input type="hidden" value="{{formID}}" name="formID">
-                <section>
-              <label for="assignanalyst">Assigned To:</label><input type="text" id="assignanalyst"
-                value="{{x[16]}}" name="newAssignedAnalyst">
-                </section>
-                <br>
-                <label for="requestor">Requested By:</label><input type="text" id="requestor" value="{{x[4]}}"readonly>
-                <br>
-                <label for="priority">Priority:</label><input type="text" id="requestor" value="{{x[17]}}" readonly>
-                <br>
-                <label for="duedate">Due Date:</label><input type="text" id="duedate" value="{{x[3]}}" readonly>
-                <br>
-                <label for="description">Description:</label><textarea id="description" readonly>{{x[11]}}</textarea>
-                <br>
-                <input type="submit" value="Update">
-            </form>
-        </div>
-            {% endif %}
-            {% endfor %}
-        </div>
+
+    <div class="form-style-1">
+        <formtitle>Unassigned Request Form</formtitle>
+        <form method="POST" action="./update">
+            <!--Requestor section-->
+            <section>
+                <div class="form-style-1-heading">Requestor</div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="requestor"><span>Name:</span></label><input type="text" id="requestor"
+                                value="{{x[4]}}" class="readonly-input-field" readonly>
+                            <label for="organization"><span>Organization:</span></label><input type="text"
+                                id="organization" value="{{x[6]}}" class="readonly-input-field" readonly>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="phone"><span>Phone:</span></label><input type="text" id="phone" value="{{x[7]}}"
+                                class="readonly-input-field" readonly>
+                            <label for="email"><span>Email:</span></label><input type="text" id="email" value="{{x[9]}}"
+                                class="readonly-input-field" readonly>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <br><br><br>
+
+            <!--Request section-->
+            <section>
+                <div class="form-style-1-heading">Request</div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="formid"><span>Request ID:</span></label><input type="text" id="formid"
+                                value="{{formID}}" name="formID" class="readonly-input-field" readonly>
+                            <label for="datesubmitted"><span>Submitted on:</span></label><input type="text"
+                                id="datesubmitted" value="{{x[2]}}" class="readonly-input-field" readonly>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="title"><span>Request Title:</span></label><input type="text" id="title"
+                                value="{{x[13]}}" class="readonly-input-field" readonly>
+                            <label for="duedate"><span>Due Date:</span></label><input type="text" id="duedate"
+                                value="{{x[3]}}" class="readonly-input-field" readonly>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-sm">
+                                    <label for="status"><span style="width: 60px;">Status:</span></label><input
+                                        type="text" id="status" value="{{x[22]}}" class="readonly-input-field"
+                                        style="width: 50%;" readonly>
+                                </div>
+                                <div class="col-sm">
+                                    <label for="priority"><span style="width: 60px;">Priority:</span></label><input
+                                        type="text" id="priority" value="{{x[17]}}" class="readonly-input-field"
+                                        style="width: 50%;" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="assignanalyst"><span>Assign To:</span></label><input type="text"
+                                id="assignanalyst" value="{{x[16]}}" name="newAssignedAnalyst" class="input-field"
+                                style="width: 60%;">
+                        </div>
+                    </div>
+                    <br>
+                    <label for="description"><span>Description:</span></label><textarea id="description"
+                        class="readonly-textarea-field" readonly>{{x[11]}}</textarea>
+                    <label for="notes"><span>Notes:</span></label><textarea id="notes"
+                        class="textarea-field">{{x[19]}}</textarea>
+
+                    <input type="submit" value="Update and Notify Analyst">
+                </div>
+            </section>
+            <br><br><br>
+
+
+            <!--Assignment section-->
+            <!--<section>
+                <div class="form-style-1-heading">Assignment</div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label for="assignanalyst"><span>Assigned To:</span></label><input type="text"
+                                id="assignanalyst" value="{{x[16]}}" name="newAssignedAnalyst" class="input-field"
+                                style="width: 30%;">
+                            <input type="submit" value="Update and Notify Analyst">
+                        </div>
+                        <div class="col-sm-6">
+
+                        </div>
+                    </div>
+                </div>
+            </section>-->
+        </form>
+        {% endif %}
+        {% endfor %}
     </div>
+</div>
 </div>
 </div>
 <!-- end page content -->
