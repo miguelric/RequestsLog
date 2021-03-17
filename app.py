@@ -20,7 +20,8 @@ from flask import Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import datetime
-
+import os
+"""
 startDate = '2018/10/01'
 endDate = '2019/10/01'
 if datetime.date.today().isoweekday() == 1:
@@ -37,7 +38,7 @@ print(nextWeek)
 startDate = startDate.strftime("%Y-%m-%d")
 endDate = endDate.strftime("%Y-%m-%d")
 nextWeek = nextWeek.strftime("%Y-%m-%d")
-
+"""
 
 app = Flask(__name__)                                                # define our application
    
@@ -61,7 +62,7 @@ for row in cursor.fetchall():
 
 
 #Fetch ALL requests that are open this WEEK (dueThisWeek.html)
-cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND dueDate >= '"+ startDate + "' and dueDate <= '"+ endDate +"'")
+#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND dueDate >= '"+ startDate + "' and dueDate <= '"+ endDate +"'")
 
 
 thisWeekDict = []
@@ -165,7 +166,6 @@ session = Session()
 def update():
     newAssignedAnalyst = request.form.get("newAssignedAnalyst")
     formID = request.form.get("formID")
-    print(formID)
 
     # Will print the raw SQL expression for querying database
     #print(session.query(db_table))
@@ -186,6 +186,29 @@ def update():
 #########################################
 
 
+# Export bar graph for each analyst to barGraphs folder
+for x in myDict:
+    # Test Data
+    names = ['This Week', 'Next Week', 'Other']
+    analyst = x
+    values =  myDict[analyst]
+
+    #Creating Graph
+    fig = plt.figure(figsize=(15,5))
+    axis = fig.add_subplot(111)
+
+    axis.bar(names, values, color='#ff8c00', label = 'Total Requests', width = .7, linewidth = .6, edgecolor = 'black') #orange
+
+    axis.set_xlabel("")
+    axis.set_ylabel("Amount of Requests")
+
+    axis.spines['right'].set_visible(False)
+    axis.spines['top'].set_visible(False)
+    axis.tick_params(bottom=False)   
+    axis.set_title('Requests for ' + analyst)
+    name = analyst + ".png"
+    my_path = 'barGraphs/'
+    fig.savefig(os.path.join(my_path, name))   
 
 
 
@@ -219,6 +242,10 @@ def create_figure():
     
     return fig
 """
+
+
+
+
 
 # CHANGE THIS TO CHANGE GRAPH TO SPECIFIC ANALYST
 chosenAnalyst = uniqueNames[4]
