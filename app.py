@@ -185,6 +185,7 @@ def update():
 
 #########################################
 
+my_path = 'static/barGraphs/'
 
 # Export bar graph for each analyst to barGraphs folder
 for x in myDict:
@@ -207,22 +208,54 @@ for x in myDict:
     axis.tick_params(bottom=False)   
     axis.set_title('Requests for ' + analyst)
     name = analyst + ".png"
-    my_path = 'barGraphs/'
     fig.savefig(os.path.join(my_path, name))   
 
 
 
 
 
-#plt.show()
+
+# Exporting main graph into barGraphs directory
+uniqueNames = ['Ashwin', 'Brian', 'Fikrewold', 'Francisco', "Jinny", 'Lauren', 'Mahmoud', 'Peter', 'Scott', 'Shanna']
+total =     [5, 6, 15, 22, 24, 8, 11, 1, 4, 2]
+thisWeek =  [1, 2, 7, 9, 6, 2, 4, 0, 1, 0]
+
+fig = plt.figure(figsize=(15,5))
+axis = fig.add_subplot(111)
+
+axis.bar(uniqueNames, total, color='#ff8c00', label = 'Total Requests', width = .7, linewidth = .6, edgecolor = 'black') #orange
+axis.bar(uniqueNames, thisWeek, color='#002fa7', label = 'Requests this Week', width = .7, linewidth = .6, edgecolor = 'black') #navy
+
+axis.set_xlabel("")
+axis.set_ylabel("Amount of Requests")
+
+axis.spines['right'].set_visible(False)
+axis.spines['top'].set_visible(False)
+axis.tick_params(bottom=False)   
+
+axis.legend(frameon = False)
+
+fig.savefig(os.path.join(my_path, 'mainGraph'))   
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Old way of importing graphs into website
 """
 def create_figure():
-
     # Test Data
     uniqueNames = ['Ashwin', 'Brian', 'Fikrewold', 'Francisco', "Jinny", 'Lauren', 'Mahmoud', 'Peter', 'Scott', 'Shanna']
     total =     [5, 6, 15, 22, 24, 8, 11, 1, 4, 2]
     thisWeek =  [1, 2, 7, 9, 6, 2, 4, 0, 1, 0]
-
 
     #Creating Graph
     fig = plt.figure(figsize=(15,5))
@@ -237,26 +270,17 @@ def create_figure():
     axis.spines['right'].set_visible(False)
     axis.spines['top'].set_visible(False)
     axis.tick_params(bottom=False)   
-
     axis.legend(frameon = False)
-    
     return fig
-"""
-
-
-
-
 
 # CHANGE THIS TO CHANGE GRAPH TO SPECIFIC ANALYST
 chosenAnalyst = uniqueNames[4]
-
 def testFig(x):
     print(myDict)
     # Test Data
     names = ['This Week', 'Next Week', 'Other']
     analyst = x
     values =  myDict[analyst]
-
 
     #Creating Graph
     fig = plt.figure(figsize=(15,5))
@@ -272,13 +296,7 @@ def testFig(x):
     axis.tick_params(bottom=False)   
     axis.set_title('Requests for ' + analyst)
 
-    
     return fig
-
-
-
-
-
 
 @app.route('/plot.png')
 def plot_png():
@@ -288,11 +306,7 @@ def plot_png():
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
-
-
-
-
-
+"""
 
 
 
