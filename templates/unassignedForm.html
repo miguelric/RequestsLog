@@ -83,9 +83,13 @@
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <label for="assignanalyst"><span>Assign To:</span></label><input type="text"
-                                id="assignanalyst" value="{{x[16]}}" name="newAssignedAnalyst" class="input-field"
-                                style="width: 60%;">
+                            <label for="assignanalyst"><span>Assign To:</span><select id="assignanalyst"
+                                    name="newAssignedAnalyst" class="select-field" style="width: 60%;">
+                                    <option value="{{x[16]}}">{{x[16]}}</option>
+                                    {% for analyst in analystList %}
+                                    <option value="{{analyst[7]}}">{{analyst[7]}}</option>
+                                    {% endfor %}
+                                </select></label>
                         </div>
                     </div>
                     <br>

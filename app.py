@@ -176,22 +176,34 @@ def update():
     # Unexpected behavior?
     #session.query(db_table).filter(db_table.requestId == 'formID').update({'assignedTo': newAssignedAnalyst})
     
-
+    
     record = session.query(db_table).filter_by(requestId = formID).one()
-    record.assignedTo = newAssignedAnalyst
-    record.notes = newNotes
+    
+    if newAssignedAnalyst == "None" or not newAssignedAnalyst:
+        record.assignedTo = None
+    else:
+        record.assignedTo = newAssignedAnalyst
+    
+    if newNotes == "None" or not newNotes:
+        record.notes = None
+    else:
+        record.notes = newNotes
+    
     session.add(record)
     '''
-    sql = "UPDATE records SET assignedTo = ? SET notes = ? WHERE formID = ?"
+    sql = "UPDATE requests SET assignedTo = ?, notes = ? WHERE requestID = ?"
     cursor.execute(sql, newAssignedAnalyst, newNotes, formID)
     '''
     session.commit()
+
     
     
     return redirect("/unassigned")
 
 #########################################
 
+#Uncomment me - on Miguel's end
+'''
 my_path = 'static/barGraphs/'
 
 # Export bar graph for each analyst to barGraphs folder
@@ -217,11 +229,11 @@ for x in myDict:
     name = analyst + ".png"
     fig.savefig(os.path.join(my_path, name))   
 
+'''
 
 
-
-
-
+#Uncomment me - on Miguel's end
+'''
 # Exporting main graph into barGraphs directory
 uniqueNames = ['Ashwin', 'Brian', 'Fikrewold', 'Francisco', "Jinny", 'Lauren', 'Mahmoud', 'Peter', 'Scott', 'Shanna']
 total =     [5, 6, 15, 22, 24, 8, 11, 1, 4, 2]
@@ -243,7 +255,7 @@ axis.tick_params(bottom=False)
 axis.legend(frameon = False)
 
 fig.savefig(os.path.join(my_path, 'mainGraph'))  
-
+'''
 
 
 
@@ -380,7 +392,13 @@ def unassignedForm():
     db = dic
     formID = request.args.get('form')
  
-    return render_template("unassignedForm.html", df = df, db = db, formID = formID)
+    # fetch ALL the analysts from the the assignedTo table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    analystList = []
+    for row in cursor.fetchall():
+        analystList.append(row)
+
+    return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList)
 
 
 
