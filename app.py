@@ -164,8 +164,9 @@ session = Session()
 # update the assigned analyst - routed from unassignedForm.html
 @app.route("/update", methods=["POST"])
 def update():
-    newAssignedAnalyst = request.form.get("newAssignedAnalyst")
     formID = request.form.get("formID")
+    newAssignedAnalyst = request.form.get("newAssignedAnalyst")
+    newNotes = request.form.get("newNotes")
 
     # Will print the raw SQL expression for querying database
     #print(session.query(db_table))
@@ -178,8 +179,14 @@ def update():
 
     record = session.query(db_table).filter_by(requestId = formID).one()
     record.assignedTo = newAssignedAnalyst
+    record.notes = newNotes
     session.add(record)
+    '''
+    sql = "UPDATE records SET assignedTo = ? SET notes = ? WHERE formID = ?"
+    cursor.execute(sql, newAssignedAnalyst, newNotes, formID)
+    '''
     session.commit()
+    
     
     return redirect("/unassigned")
 
@@ -235,7 +242,7 @@ axis.tick_params(bottom=False)
 
 axis.legend(frameon = False)
 
-fig.savefig(os.path.join(my_path, 'mainGraph'))   
+fig.savefig(os.path.join(my_path, 'mainGraph'))  
 
 
 
