@@ -202,8 +202,7 @@ def update():
 
 #########################################
 
-#Uncomment me - on Miguel's end
-'''
+
 my_path = 'static/barGraphs/'
 
 # Export bar graph for each analyst to barGraphs folder
@@ -229,11 +228,12 @@ for x in myDict:
     name = analyst + ".png"
     fig.savefig(os.path.join(my_path, name))   
 
-'''
 
 
-#Uncomment me - on Miguel's end
-'''
+
+
+
+
 # Exporting main graph into barGraphs directory
 uniqueNames = ['Ashwin', 'Brian', 'Fikrewold', 'Francisco', "Jinny", 'Lauren', 'Mahmoud', 'Peter', 'Scott', 'Shanna']
 total =     [5, 6, 15, 22, 24, 8, 11, 1, 4, 2]
@@ -255,7 +255,6 @@ axis.tick_params(bottom=False)
 axis.legend(frameon = False)
 
 fig.savefig(os.path.join(my_path, 'mainGraph'))  
-'''
 
 
 
@@ -359,8 +358,14 @@ def allRequests():
 
     df = uniqueNames
     db = dic
- 
-    return render_template("allRequests.html", df = df, db = db)
+
+    # fetch ALL the analysts from the the assignedTo table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    analystList = []
+    for row in cursor.fetchall():
+        analystList.append(row)
+
+    return render_template("allRequests.html", df = df, db = db, analystList = analystList)
 
 
 
@@ -375,7 +380,7 @@ def unassigned():
 
     df = uniqueNames
     db = dic
- 
+
     return render_template("unassigned.html", df = df, db = db)
 
 

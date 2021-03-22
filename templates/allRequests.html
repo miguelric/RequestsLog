@@ -21,13 +21,21 @@
 	<div class="col-sm-12">
 		<div class="col-sm-12 text-sm-center">
 
-			{% for i in df %}
+			{% for analyst in analystList %}
+
+			{% set a_fullname = analyst[7] %}
+			{% set a_firstname = analyst[1] %}
+			{% set a_lastname = analyst[2] %}
 
 			<!--To calculate the number of requests per analyst-->
 			{% set total_req = namespace(value=0) %}
 			{% for x in db %}
-			{% if x[16] == i %}
+			{% if x[16] != None %}
+			{% set db_assignedTo = x[16] %}
+			{% set splitname = db_assignedTo.split() %}
+			{% if(( x[16] == a_fullname ) or ( a_lastname == splitname[1] and a_firstname == splitname[0] )) %}
 			{% set total_req.value = total_req.value + 1 %}
+			{% endif %}
 			{% endif %}
 			{% endfor %}
 
@@ -38,8 +46,9 @@
 						<h5 class="mb-0">
 							<a data-toggle="collapse" href="#collapse-{{ loop.index }}" aria-expanded="true"
 								aria-controls="collapse-{{ loop.index }}">
-								{{ i }}      | Total Requests: {{ total_req.value }} 
-							 
+								<!--{{ i }} | Total Requests: {{ total_req.value }}-->
+
+								{{ analyst[7] }} | Total Requests: {{ total_req.value }}
 							</a>
 						</h5>
 					</div>
@@ -48,7 +57,11 @@
 						aria-labelledby="heading-{{ loop.index }}" data-parent="#accordion-{{ loop.index }}">
 						<!--Card subsection for every request matching the analyst-->
 						{% for x in db %}
-						{% if x[16] == i %}
+						{% if x[16] != None %}
+						{% set db_assignedTo = x[16] %}
+						{% set splitname = db_assignedTo.split() %}
+						{% if(( x[16] == a_fullname ) or ( a_lastname == splitname[1] and a_firstname == splitname[0] ))
+						%}
 						<div class="card-body">
 							{{x[11]}}<br><br>
 
@@ -59,6 +72,7 @@
 							Days Open: <br>
 							<hr style="height:2px;border-width:0;color:gray;background-color:gray">
 						</div>
+						{% endif %}
 						{% endif %}
 						{% endfor %}
 					</div>
