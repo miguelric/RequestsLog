@@ -232,8 +232,6 @@ for x in myDict:
 
 
 
-
-
 # Exporting main graph into barGraphs directory
 uniqueNames = ['Ashwin', 'Brian', 'Fikrewold', 'Francisco', "Jinny", 'Lauren', 'Mahmoud', 'Peter', 'Scott', 'Shanna']
 total =     [5, 6, 15, 22, 24, 8, 11, 1, 4, 2]

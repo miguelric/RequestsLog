@@ -224,3 +224,93 @@ body {
 	background: #d63d00;
 	color: #D9D9D9;
 }
+
+
+
+
+/**********Accordian card body styles**********/
+.card{
+	text-align: left;
+}
+
+.card-header:not(.collapsed) {
+    background:#E0E0E0;
+}
+
+.mb-0 > a.collapse:before {
+    float: right !important;
+    font-family: FontAwesome;
+    content:"\f067";
+    padding-right: 5px;
+}
+.mb-0 > a.collapsed:before {
+    float: right !important;
+    font-family: FontAwesome;
+    content:"\f067";	
+    padding-right: 5px;
+}
+.mb-0 > a:before {
+    float: right !important;
+    font-family: FontAwesome;
+    content:"\f068";
+    padding-right: 5px;
+}
+.mb-0 > a:hover, 
+.mb-0 > a:active, 
+.mb-0 > a:focus  {
+    text-decoration:none;
+}
+
+.card-body label{
+	display: block;
+	margin: 0px 0px 0px 0px;
+}
+.card-body label > span{
+	width: 100px;
+	font-weight: bold;
+	float: left;
+	padding-top: 8px;
+	padding-right: 5px;
+}
+.card-body input.readonly-input-field, .card-body .readonly-textarea-field{
+	width: 75%;	
+}
+
+
+.card-body input.readonly-input-field,
+.card-body .readonly-textarea-field{
+	background: #f8f8f8;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	border: 1px solid #d6d6d6;
+	box-shadow: 1px 1px 4px #EBEBEB;
+	-moz-box-shadow: 1px 1px 4px #EBEBEB;
+	-webkit-box-shadow: 1px 1px 4px #EBEBEB;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	padding: 7px;
+	outline: none;
+}
+
+.card-body .readonly-textarea-field{
+	height:100px;
+	width: 75%;
+}
+.card-body input[type=button]{
+	border: none;
+	padding: 8px 15px 8px 15px;
+	background: #ff5500;
+	color: #fff;
+	box-shadow: 1px 1px 4px #DADADA;
+	-moz-box-shadow: 1px 1px 4px #DADADA;
+	-webkit-box-shadow: 1px 1px 4px #DADADA;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+.card-body input[type=button]:hover{
+	background: #d63d00;
+	color: #D9D9D9;
+}
