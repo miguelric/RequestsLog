@@ -8,6 +8,20 @@
 
 {% block content %}
 <!-- begin page content -->
+<script type="text/javascript">	
+	function swap(){
+			var leftID = document.getElementById('pic_left');
+				rightID = document.getElementById('pic_right');
+				leftSRC = leftID.src;
+				rightSRC = rightID.src;
+			leftID.src = NULL;
+			rightID.src = leftID;
+	}
+
+</script>
+
+
+
 <div class="row">
 	<image src="{{ url_for('static', filename = 'images/rowdy.png'   )}}" width=10% href="/">
 		<div class="col-sm-12">
@@ -17,8 +31,12 @@
 		<div class="col-sm-12">
 			<div class="col-sm-12 text-sm-center">
 				<!-- <img src="/plot.png" alt="Requests Table"> -->
-				<!--Uncomment me: Images for graphs had not been added-->
-				<!--<image src="{{ url_for('static', filename = 'barGraphs/mainGraph.png'   )}}" width=100% href="/">-->
+				<image id = pic_left src="{{ url_for('static', filename = 'barGraphs/mainGraph.png'   )}}" width=100% href="/">
+					<form >
+						<input type="button" value="SWAP" onclick = "swap();"">
+
+
+					</form>
 			</div>
 		</div>
 </div>
