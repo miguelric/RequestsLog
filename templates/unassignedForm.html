@@ -23,6 +23,15 @@
     <!--Specify that the form should post its data
             to the /update route. We will also prepopulate the data.-->
 
+    <!--For fetching rqstTitle-->
+    {% if x[13] != None %}
+    {% set request_title = x[13] %}
+    {% endif %}
+    <!--If rqstTitle null, fetch rqstURL-->
+    {% if x[13] == None %}
+    {% set request_title = x[10] %}
+    {% endif %}
+
     <div class="form-style-1">
         <formtitle>Unassigned Request Form</formtitle>
         <form method="POST" action="./update">
@@ -61,7 +70,7 @@
                         </div>
                         <div class="col-sm-6">
                             <label for="title"><span>Request Title:</span></label><input type="text" id="title"
-                                value="{{x[13]}}" class="readonly-input-field" readonly>
+                                value="{{request_title}}" class="readonly-input-field" readonly>
                             <label for="duedate"><span>Due Date:</span></label><input type="text" id="duedate"
                                 value="{{x[3]}}" class="readonly-input-field" readonly>
                         </div>
