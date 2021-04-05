@@ -23,7 +23,7 @@
 
 			{% for analyst in analystList %}
 
-			{% set a_fullname = analyst[7] %}
+			{% set a_fullname = analyst[3] %}
 			{% set a_firstname = analyst[1] %}
 			{% set a_lastname = analyst[2] %}
 
@@ -48,7 +48,7 @@
 								aria-expanded="true" aria-controls="collapse-{{ loop.index }}">
 								<!--{{ i }} | Total Requests: {{ total_req.value }}-->
 
-								{{ analyst[7] }} | Total Requests: {{ total_req.value }}
+								{{ a_fullname }} | Total Requests: {{ total_req.value }}
 							</a>
 						</h5>
 					</div>

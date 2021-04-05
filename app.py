@@ -203,6 +203,7 @@ def update():
 #########################################
 
 
+'''
 my_path = 'static/barGraphs/'
 
 # Export bar graph for each analyst to barGraphs folder
@@ -229,7 +230,8 @@ for x in myDict:
     fig.savefig(os.path.join(my_path, name))   
 
 
-
+'''
+'''
 
 
 # Exporting main graph into barGraphs directory
@@ -256,7 +258,7 @@ fig.savefig(os.path.join(my_path, 'mainGraph'))
 
 
 
-
+'''
 
 
 
@@ -357,7 +359,7 @@ def allRequests():
     df = uniqueNames
     db = dic
 
-    # fetch ALL the analysts from the the assignedTo table
+    # fetch ALL the analysts from the assignedTo table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
@@ -395,7 +397,7 @@ def unassignedForm():
     db = dic
     formID = request.args.get('form')
  
-    # fetch ALL the analysts from the the assignedTo table
+    # fetch ALL the analysts from the assignedTo table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
