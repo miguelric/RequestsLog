@@ -1,6 +1,6 @@
 {% extends "site_base_layout.html" %}
 
-{% block title %}All Requests{% endblock %}
+{% block title %}Assigned Requests{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -16,12 +16,14 @@
 	</a>
 	<div class="col-sm-12">
 		<h1>UTSA OIR Data Requests</h1>
-		<p>All Request by Analyst</p>
+		<p>Assigned Requests by Analyst</p>
 	</div>
 	<div class="col-sm-12">
 		<div class="col-sm-12 text-sm-center">
 
-			{% for analyst in analystList %}
+			<!--TOP LEVEL: For each item (analyst) in the analystList, which was passed to this page by app.py-->
+			<!--For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort-->
+			{% for analyst in analystList|sort(attribute="lastName") %}
 
 			{% set a_fullname = analyst[3] %}
 			{% set a_firstname = analyst[1] %}
@@ -30,9 +32,14 @@
 			<!--To calculate the number of requests per analyst-->
 			{% set total_req = namespace(value=0) %}
 			{% for x in db %}
+			<!--If an analyst exists for the request (value is not NULL)-->
 			{% if x[16] != None %}
 			{% set db_assignedTo = x[16] %}
+			<!--Split the first and last name so we can match against firstName and lastName column in assignedTo table-->
 			{% set splitname = db_assignedTo.split() %}
+			<!--Extra safety - if either the full name matches the full analyst name
+			OR the first name matches analyst[1] (a_firstname) AND last name matches analyst[2] (a_lastname),
+		    then count that request as being assigned to that analyst-->
 			{% if(( x[16] == a_fullname ) or ( a_lastname == splitname[1] and a_firstname == splitname[0] )) %}
 			{% set total_req.value = total_req.value + 1 %}
 			{% endif %}
@@ -46,9 +53,7 @@
 						<h5 class="mb-0">
 							<a class="collapsed" data-toggle="collapse" href="#collapse-{{ loop.index }}"
 								aria-expanded="true" aria-controls="collapse-{{ loop.index }}">
-								<!--{{ i }} | Total Requests: {{ total_req.value }}-->
-
-								{{ a_fullname }} | Total Requests: {{ total_req.value }}
+								{{ a_lastname }}, {{ a_firstname }} | Total Requests: {{ total_req.value }}
 							</a>
 						</h5>
 					</div>
