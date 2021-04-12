@@ -2,7 +2,7 @@
 ### Development and Documentation Notes (in process)
 
 
-##### Running the application using flask run
+#### Running the application using flask run
 This command is OK if accessing the app from the same computer. However, from another computer in the LAN,
 the access will fail. Flask will listen to 127.0.0.1, the loopback address, meaning it will only receive machine-local requests.
 
