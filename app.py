@@ -49,7 +49,7 @@ cursor = cnxn.cursor()
 
 
 
-# Fetch ALL requests that are open (allRequests.html)
+# Fetch ALL requests that are open (assignedRequests.html)
 cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
 
 
@@ -333,7 +333,7 @@ def homepage():
 
     # With the database being updated from within this app, as well as any queries/updates/deletes/adds that
     # happen through SSMS or other clients, it is safer to re-fetch the database on page load.
-    # Re-fetch ALL requests that are open (allRequests.html)
+    # Re-fetch ALL requests that are open (assignedRequests.html)
     dic = []
     for row in cursor.fetchall():
         dic.append(row)
@@ -347,10 +347,10 @@ def homepage():
     return render_template("index.html", df = df, db = db)
 
 
-@app.route('/allRequests')                                                   # url mapping main page
-def allRequests():
+@app.route('/assignedRequests')                                                   # url mapping main page
+def assignedRequests():
 
-    # Re-fetch ALL requests that are open (allRequests.html)
+    # Re-fetch ALL requests that are open (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
@@ -365,14 +365,14 @@ def allRequests():
     for row in cursor.fetchall():
         analystList.append(row)
 
-    return render_template("allRequests.html", df = df, db = db, analystList = analystList)
+    return render_template("assignedRequests.html", df = df, db = db, analystList = analystList)
 
 
 
 @app.route('/unassigned')                                                   # url mapping main page
 def unassigned():
 
-    # Re-fetch ALL requests that are open (allRequests.html)
+    # Re-fetch ALL requests that are open (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
@@ -387,7 +387,7 @@ def unassigned():
 @app.route('/unassignedForm')                                                   # url mapping main page
 def unassignedForm():
 
-    # Re-fetch ALL requests that are open (allRequests.html)
+    # Re-fetch ALL requests that are open (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
@@ -410,7 +410,7 @@ def unassignedForm():
 @app.route('/dueThisWeek')                                                   # url mapping main page
 def dueThisWeek():
 
-    # Re-fetch ALL requests that are open (allRequests.html)
+    # Re-fetch ALL requests that are open (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
@@ -428,7 +428,7 @@ def dueThisWeek():
 @app.route('/statusUpdate')                                                   # url mapping main page
 def statusUpdate():
 
-    # Re-fetch ALL requests that are open (allRequests.html)
+    # Re-fetch ALL requests that are open (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
