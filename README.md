@@ -40,8 +40,4 @@ class="readonly-textarea-field" readonly>{{x[11]}}</textarea>
 ```
 <label for="description"><span>Description:</span></label><textarea id="description"
 class="readonly-textarea-field" readonly>{{x.rqstBy_description}}</textarea>
-<<<<<<< HEAD
 ```
-=======
-```
->>>>>>> c14f4fcf9d3b352154d4b4b7ee573b64df96733d
