@@ -365,6 +365,7 @@ def assignedRequests():
     for row in cursor.fetchall():
         analystList.append(row)
 
+
     return render_template("assignedRequests.html", df = df, db = db, analystList = analystList)
 
 
