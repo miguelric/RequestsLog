@@ -1,6 +1,7 @@
 # OIR DATA REQUESTS LOG PORTAL
 
 ## Development and Documentation Notes
+Hopefully this is helpful for future contributers...
 <details open>
 <summary>Table of Contents</summary>
 
@@ -10,11 +11,12 @@
 - [How tables in the database are "read-in" and parsed](#s4)
 - [Handling columns](#s5)
 - [Site Base Layout and Jinja Template Basics](#s6)
-- [Assigned Requests](#s7)
-- [Unassigned Requests](#s8)
-- [Form for an Unassigned Request](#s9)
-- [Due this Week](#s10)
-- [Status Update](#s11)
+- Individual Form Pages
+    - [Assigned Requests](#s7)
+    - [Unassigned Requests](#s8)
+    - [Form for an Unassigned Request](#s9)
+    - [Due this Week](#s10)
+    - [Status Update](#s11)
 </details>
 
 ---
@@ -51,6 +53,7 @@ Now, technically, a row is not a record, a distinction not made well in some doc
 Also helpful: CRUD using SQLAlchemy ORM: https://overiq.com/sqlalchemy-101/crud-using-sqlalchemy-orm/
 
 ---
+
 ### About getting an existing database table and sessions <a name="s3"/>
 As the starting point for this Flask-SQLAlchemy application, the engine is configured in `app.py` (more about it here: https://docs.sqlalchemy.org/en/14/core/engines.html):
 ```
@@ -79,6 +82,8 @@ class db_table(Base):
 
 Base.prepare(engine, reflect=True)
 ```
+
+---
 
 ### How tables in the database are "read-in" and parsed <a name="s4"/>
 
@@ -278,6 +283,7 @@ The `showForm()` function uses the `window.location` object to get the current p
     End for
 
 ```
+
 ---
 
 ### Form for an Unassigned Request <a name="s9"/>
@@ -351,6 +357,8 @@ The various `request.form.get()` methods will retrieve form data, using them as 
         End if
     End for
 ```
+
+---
 
 ### Due this Week <a name="s10"/>
 
