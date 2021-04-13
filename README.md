@@ -2,7 +2,6 @@
 
 ## Development and Documentation Notes
 Hopefully this is helpful for future contributers.
-Past contributers: Christina Zhang and Miguel Rico
 
 <details open>
 <summary>Table of Contents</summary>
@@ -19,6 +18,7 @@ Past contributers: Christina Zhang and Miguel Rico
     - [Form for an Unassigned Request](#s9)
     - [Due this Week](#s10)
     - [Status Update](#s11)
+- [Past Contributors and Contacts](#contact)
 </details>
 
 ---
@@ -382,4 +382,13 @@ The various `request.form.get()` methods will retrieve form data, using them as 
 
 ---
 
-###  Status Update <a name="s11"/>
+### Status Update <a name="s11"/>
+
+---
+
+### Past Contributors and Contact <a name="contact"/>
+
+Christina Zhang
+Email: christina.zhang@utsa.edu
+
+Miguel Rico
