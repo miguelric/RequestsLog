@@ -1,7 +1,7 @@
 # OIR DATA REQUESTS LOG PORTAL
 
 ## Development and Documentation Notes
-Hopefully this is helpful for future contributers...
+Hopefully this is helpful for future contributers.
 <details open>
 <summary>Table of Contents</summary>
 
@@ -304,7 +304,7 @@ return render_template("unassignedForm.html", df = df, db = db, formID = formID,
 | `newAssignedAnalyst`| set to value of selected analyst in form |
 | `newNotes`          | set to value of notes field in form |
 | `request_title`     | set to value of 14th column (rqstTitle) OR 11th column (rqstURL) in dbo.requests |
-| `db_table`          | name of model pre-declared for the 'requests' table - reference **About getting an existing database table and sessions** section |
+| `db_table`          | name of model pre-declared for the 'requests' table - reference [**About getting an existing database table and sessions** section](#s3) |
 
 
 **Functions**
