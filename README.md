@@ -139,7 +139,6 @@ Since the rows and their metadata of a specified database table are stored is li
 
 It's relevant to note that an alternative to indexing using `[]` is to do an attribute access (dot notation). It occasionally has its limitations (e.g. special column names, creating a new column won't be consistent with column in the case the column name is changed, won't work if you have spaces in the column name/if it's an integer etc), so indexing using `[]` seems to be preferable. If the original database table is edited so that the *order* of columns change, then it will pose a problem (so don't change the order of columns! - column *names* can be edited). If dot notation is desired as a better substitute (under the assumption that the column names in the database won't be changed, *and* you know what you're doing), then it's your discretion.
 
-Also! I did use the dot notation in the update() function in `app.py`... this might be changed, but maybe not hah.
 
 For example:
 ```
@@ -162,6 +161,22 @@ class="readonly-textarea-field" readonly>{{x[11]}}</textarea>
 <label for="description"><span>Description:</span></label><textarea id="description"
 class="readonly-textarea-field" readonly>{{x.rqstBy_description}}</textarea>
 ```
+
+Also! Notice I did use the dot notation in the update() function in `app.py`. Model objects do not support item assignment, and using something like:
+```
+    row = session.query(db_table).filter_by(requestId = formID).one()
+    
+    if newAssignedAnalyst == "None" or not newAssignedAnalyst:
+        row[16] = None
+    else:
+        row[16] = newAssignedAnalyst
+```
+...will give you this error "TypeError: 'db_table' object does not support item assignment". Perhaps you can do something like
+```
+def __getitem__(self, key):
+    return getattr(self, key)
+```
+...if you want to use self[key] to access the value, but I found no need for it at the current stage.
 
 ---
 
