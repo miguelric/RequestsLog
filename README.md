@@ -1,11 +1,25 @@
 # OIR DATA REQUESTS LOG PORTAL
 
 ## Development and Documentation Notes
+<details open>
+<summary>Table of Contents</summary>
 
+- [Running the application using flask run](#s1)
+- [Frameworks, dependencies, any clarifications on semantics, and helpful documentation](#s2)
+- [About getting an existing database table and sessions](#s3)
+- [How tables in the database are "read-in" and parsed](#s4)
+- [Handling columns](#s5)
+- [Site Base Layout and Jinja Template Basics](#s6)
+- [Assigned Requests](#s7)
+- [Unassigned Requests](#s8)
+- [Form for an Unassigned Request](#s9)
+- [Due this Week](#s10)
+- [Status Update](#s11)
+</details>
 
 ---
 
-### Running the application using flask run
+### Running the application using flask run <a name="s1"/>
 This command is OK if accessing the app from the same computer. However, from another computer in the LAN, the access will fail. Flask will listen to 127.0.0.1, the loopback address, meaning it will only receive machine-local requests.
 
 ```
@@ -20,7 +34,7 @@ $ FLASK_DEBUG=1 python -m flask run -h localhost -p 3000
 
 ---
 
-### Frameworks, dependencies, any clarifications on semantics, and helpful documentation
+### Frameworks, dependencies, any clarifications on semantics, and helpful documentation <a name="s2"/>
 This is a Flask application that uses the Flask-SQLAlchemy extension (an ORM).
 
 Flask Documentation: https://flask.palletsprojects.com/en/1.1.x/
@@ -37,7 +51,7 @@ Now, technically, a row is not a record, a distinction not made well in some doc
 Also helpful: CRUD using SQLAlchemy ORM: https://overiq.com/sqlalchemy-101/crud-using-sqlalchemy-orm/
 
 ---
-### About getting an existing database table and sessions
+### About getting an existing database table and sessions <a name="s3"/>
 As the starting point for this Flask-SQLAlchemy application, the engine is configured in `app.py` (more about it here: https://docs.sqlalchemy.org/en/14/core/engines.html):
 ```
 engine = sa.create_engine('mssql+pyodbc://BISERVDEV/IR_dataRequests?driver=SQL Server Native Client 11.0?Trusted_Connection=yes').connect()
@@ -66,7 +80,7 @@ class db_table(Base):
 Base.prepare(engine, reflect=True)
 ```
 
-### How tables in the database are "read-in" and parsed
+### How tables in the database are "read-in" and parsed <a name="s4"/>
 
 In the most common scenario (may be all scenerios, actually), the entries from a specific table in the database will be stored as a list of tuples. Read more on Python list of tuples here: https://www.askpython.com/python/list/python-list-of-tuples
 
@@ -107,7 +121,7 @@ def assignedRequests():
 
 ---
 
-### Handling columns
+### Handling columns <a name="s5"/>
 
 ![Columns in dbo.requests](/README-images/dbo.requests-columns.JPG)
 
@@ -141,7 +155,7 @@ class="readonly-textarea-field" readonly>{{x.rqstBy_description}}</textarea>
 
 ---
 
-### Site Base Layout and Jinja Template Basics
+### Site Base Layout and Jinja Template Basics <a name="s6"/>
 Flask uses the templating language Jinja, which allows for template inheritance: (https://flask.palletsprojects.com/en/1.1.x/patterns/templateinheritance/).
 
 With this in mind, `site_base_layout.html` is the template that defines the base HTML skeleton for the rest of the child templates. The `render_template()` function invokes Jinja and gives the arguments for the templating engine to substitute `{{ ... }}` blocks with corresponding values. `{% ... %}` blocks are control (conditional) statements also supported by Jinja.
@@ -155,7 +169,7 @@ The navigation bar will be displayed on the main pages of the application throug
 
 ---
 
-### Assigned Requests
+### Assigned Requests <a name="s7"/>
 
 This page displays all assigned requests.
 From `app.py`, we render this page using 
@@ -218,7 +232,7 @@ For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#so
 
 ---
 
-### Unassigned Requests
+### Unassigned Requests <a name="s8"/>
 
 This page displays all unassigned requests.
 From `app.py`, we render this page using 
@@ -236,7 +250,8 @@ return render_template("unassignedForm.html", df = df, db = db, formID = formID,
 | `unassignedID`    | Set to value of 2nd column (requestId) in dbo.assignedTo; used in `showForm()` function |
 
 
-**Functions:**
+**Functions**
+
 The `showForm()` function uses the `window.location` object to get the current page address (URL) and redirect the browser to a new page, specifically the respective form to a request. It uses `unassignedID`, which is the requestID, as the value to pass to the `form` parameter to associate the form and the request.
 
 ```
@@ -265,7 +280,7 @@ The `showForm()` function uses the `window.location` object to get the current p
 ```
 ---
 
-### Form for an Unassigned Request
+### Form for an Unassigned Request <a name="s9"/>
 This page displays the form for a specific unassigned request, with editable fields to update the row in the database. It is redirected to from `unassigned.html`.
 
 From `app.py`, we render this page using: 
@@ -287,6 +302,7 @@ return render_template("unassignedForm.html", df = df, db = db, formID = formID,
 
 
 **Functions**
+
 In `app.py`, before rendering the page, the formID is retrived from the `form` parameter. This will associate a unique form to a specific requestId i.e. a request.
 ```
 formID = request.args.get('form')
@@ -336,8 +352,8 @@ The various `request.form.get()` methods will retrieve form data, using them as 
     End for
 ```
 
-### Due this Week
+### Due this Week <a name="s10"/>
 
 ---
 
-###  Status Update
+###  Status Update <a name="s11"/>
