@@ -2,6 +2,8 @@
 
 ## Development and Documentation Notes
 Hopefully this is helpful for future contributers.
+Past contributers: Christina Zhang and Miguel Rico
+
 <details open>
 <summary>Table of Contents</summary>
 
@@ -87,17 +89,17 @@ Base.prepare(engine, reflect=True)
 
 ### How tables in the database are "read-in" and parsed <a name="s4"/>
 
-In the most common scenario (may be all scenerios, actually), the entries from a specific table in the database will be stored as a list of tuples. Read more on Python list of tuples here: https://www.askpython.com/python/list/python-list-of-tuples
+In the most common scenario (may be all scenerios, actually), the rows from a specific table in the database will be stored as a list of tuples. Read more on Python list of tuples here: https://www.askpython.com/python/list/python-list-of-tuples
 
 To show how it looks so you get the feel, the *first* row of the dbo.requests table is stored and would print to console as this:
-![First entries of dbo.requests table](/README-images/print(db[0]).JPG)
+![First row of dbo.requests table](/README-images/print(db[0]).JPG)
 
-...and *all* entries of the dbo.assignedTo table are stored as this:
-![All entries of dbo.assignedTo table](/README-images/print(analystList).JPG)
+...and *all* rows of the dbo.assignedTo table are stored as this:
+![All rows of dbo.assignedTo table](/README-images/print(analystList).JPG)
 
-By default, the entries will be sorted so that the highest id will be at the top, but you can sort the entries however using Python's `sorted()`; this is done in the individual html pages. Reference on sorting: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort
+By default, the items will be sorted so that the highest id will be at the top, but you can sort the items however using Python's `sorted()`; this is done in the individual html pages. Reference on sorting: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort
 
-The following code shows how the function will pass the entries of two tables to `assignedRequests.html` template (well, and a third list `df`, which at this time was used for working with graphs). It will then return the rendered version. 
+The following code shows how the function will pass the two lists representing rows in the dbo.assignedTo table and dbo.requests to `assignedRequests.html` template (well, and a third list `df`, which at this time was used for working with graphs). It will then return the rendered version. 
 
 Specifically, the two tables are dbo.requests and dbo.assignedTo. `SELECT *` will select all columns (though this may produce some unnecessary network load/query performance problems - it may be replaced by an explicit column list, but we need not worry about it now).
 
@@ -127,10 +129,13 @@ def assignedRequests():
 ---
 
 ### Handling columns <a name="s5"/>
-
+Columns of dbo.requests table are as listed:
 ![Columns in dbo.requests](/README-images/dbo.requests-columns.JPG)
 
-Since the entries and their metadata of a specified database table are stored is list of tuples (i.e. `{% for x in db %}` is so that `x` represents a tuple), we can use the index operator `[]` to access an item in the tuple i.e. whatever column value of the row you want to access.
+Columns of dbo.assignedTo table are:
+![Columns in dbo.assignedTo](/README-images/dbo.assignedTo-columns.JPG)
+
+Since the rows and their metadata of a specified database table are stored is list of tuples (i.e. `{% for x in db %}` is so that `x` represents a tuple), we can use the index operator `[]` to access an item in the tuple i.e. whatever column value of the row you want to access.
 
 It's relevant to note that an alternative to indexing using `[]` is to do an attribute access (dot notation). It occasionally has its limitations (e.g. special column names, creating a new column won't be consistent with column in the case the column name is changed, won't work if you have spaces in the column name/if it's an integer etc), so indexing using `[]` seems to be preferable. If the original database table is edited so that the *order* of columns change, then it will pose a problem (so don't change the order of columns! - column *names* can be edited). If dot notation is desired as a better substitute (under the assumption that the column names in the database won't be changed, *and* you know what you're doing), then it's your discretion.
 
@@ -175,7 +180,6 @@ The navigation bar will be displayed on the main pages of the application throug
 ---
 
 ### Assigned Requests <a name="s7"/>
-
 This page displays all assigned requests.
 From `app.py`, we render this page using 
 ```
@@ -186,8 +190,8 @@ return render_template("assignedRequests.html", df = df, db = db, analystList = 
 | Variable         | Description                         |
 | ----------------- | ------------------------------------|
 | `df`              | Set to a unique list of analyst names for using/testing graphs. No use in individual page. |
-| `db`              | List of tuples representing all entries and metadata in dbo.requests |
-| `analystList`     | List of tuples representing all entries and metadata in dbo.assignedTo |
+| `db`              | List of tuples representing all requests/metadata in dbo.requests |
+| `analystList`     | List of tuples representing all analysts/metadata in dbo.assignedTo |
 | `a_fullname`      | set to value of 4th column (fullName) in dbo.assignedTo |
 | `a_firstname`     | set to value of 2nd column (firstName) in dbo.assignedTo |
 | `a_lastname`      | set to value of 3rd column (lastName) in dbo.assignedTo |
@@ -238,7 +242,6 @@ For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#so
 ---
 
 ### Unassigned Requests <a name="s8"/>
-
 This page displays all unassigned requests.
 From `app.py`, we render this page using 
 ```
@@ -250,8 +253,8 @@ return render_template("unassignedForm.html", df = df, db = db, formID = formID,
 | Variable         | Description                         |
 | ----------------- | ------------------------------------|
 | `df`              | Set to a unique list of analyst names for using/testing graphs. No use in individual page. |
-| `db`              | List of tuples representing all entries and metadata in dbo.requests |
-| `analystList`     | List of tuples representing all entries and metadata in dbo.assignedTo |
+| `db`              | List of tuples representing all requests/metadata in dbo.requests |
+| `analystList`     | List of tuples representing all analysts/metadata in dbo.assignedTo |
 | `unassignedID`    | Set to value of 2nd column (requestId) in dbo.assignedTo; used in `showForm()` function |
 
 
@@ -298,8 +301,8 @@ return render_template("unassignedForm.html", df = df, db = db, formID = formID,
 | Variable            | Description                         |
 | ------------------- | ------------------------------------|
 | `df`                | Set to a unique list of analyst names for using/testing graphs. No use in individual page. |
-| `db`                | List of tuples representing all entries and metadata in dbo.requests |
-| `analystList`       | List of tuples representing all entries and metadata in dbo.assignedTo |
+| `db`                | List of tuples representing all requests/metadata in dbo.requests |
+| `analystList`       | List of tuples representing all analysts/metadata in dbo.assignedTo |
 | `formID`            | passed to parameter `form` in URL to associate a unique form to a specific request |
 | `newAssignedAnalyst`| set to value of selected analyst in form |
 | `newNotes`          | set to value of notes field in form |
