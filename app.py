@@ -177,19 +177,19 @@ def update():
     #session.query(db_table).filter(db_table.requestId == 'formID').update({'assignedTo': newAssignedAnalyst})
     
     
-    record = session.query(db_table).filter_by(requestId = formID).one()
+    row = session.query(db_table).filter_by(requestId = formID).one()
     
     if newAssignedAnalyst == "None" or not newAssignedAnalyst:
-        record.assignedTo = None
+        row.assignedTo = None
     else:
-        record.assignedTo = newAssignedAnalyst
+        row.assignedTo = newAssignedAnalyst
     
     if newNotes == "None" or not newNotes:
-        record.notes = None
+        row.notes = None
     else:
-        record.notes = newNotes
+        row.notes = newNotes
     
-    session.add(record)
+    session.add(row)
     '''
     sql = "UPDATE requests SET assignedTo = ?, notes = ? WHERE requestID = ?"
     cursor.execute(sql, newAssignedAnalyst, newNotes, formID)
@@ -364,6 +364,7 @@ def assignedRequests():
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
+
 
     return render_template("assignedRequests.html", df = df, db = db, analystList = analystList)
 
