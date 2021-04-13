@@ -388,7 +388,6 @@ The various `request.form.get()` methods will retrieve form data, using them as 
 
 ### Past Contributors and Contact <a name="contact"/>
 
-Christina Zhang
-Email: christina.zhang@utsa.edu
+Christina Zhang - Email: christina.zhang@utsa.edu
 
 Miguel Rico
