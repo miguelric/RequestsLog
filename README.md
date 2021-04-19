@@ -164,7 +164,7 @@ class="readonly-textarea-field" readonly>{{x[11]}}</textarea>
 class="readonly-textarea-field" readonly>{{x.rqstBy_description}}</textarea>
 ```
 
-Also! Notice I did use the dot notation in the update() function in `app.py`. Model objects do not support item assignment, and using something like:
+Also! Notice I did use the dot notation in the update() functions in `app.py`. Model objects do not support item assignment, and using something like:
 ```
     row = session.query(db_table).filter_by(requestId = formID).one()
     
@@ -200,7 +200,7 @@ The navigation bar will be displayed on the main pages of the application throug
 This page displays all assigned requests.
 From `app.py`, we render this page using 
 ```
-return render_template("assignedRequests.html", df = df, db = db, analystList = analystList)
+return render_template("assignedRequests.html", df = df, db = db, analystList = analystList, prioritydb = prioritydb)
 ```
 
 **Variables**
@@ -209,12 +209,14 @@ return render_template("assignedRequests.html", df = df, db = db, analystList = 
 | `df`              | Set to a unique list of analyst names for using/testing graphs. No use in individual page. |
 | `db`              | List of tuples representing all requests/metadata in dbo.requests |
 | `analystList`     | List of tuples representing all analysts/metadata in dbo.assignedTo |
+| `prioritydb`  | List of tuples representing all priority codes/metadata in dbo.priorityCode |
 | `a_fullname`      | set to value of 4th column (fullName) in dbo.assignedTo |
 | `a_firstname`     | set to value of 2nd column (firstName) in dbo.assignedTo |
 | `a_lastname`      | set to value of 3rd column (lastName) in dbo.assignedTo |
 | `total_req`       | used to count the total number of requests for an analyst |
 | `db_assignedTo`   | set to value of 17th column (assignedTo) in dbo.requests |
 | `request_title`   | set to value of 14th column (rqstTitle) OR 11th column (rqstURL) in dbo.requests |
+| `priorityCodeWord`     | set to value of 2nd column in dbo.priorityCode according to the priorityId of the request |
 
 
 For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort
@@ -243,6 +245,8 @@ For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#so
                 Set db_assignedTo to value of seventeeth column.
         
                 Split the first name and last name so we can match against firstName and lastName column in assignedTo table. 
+
+                Match the priorityId of the request (given by x[17]) to the priorityId in dbo.priorityCode so that we can get a useful description of the code (in words, not numbers).
         
                 If either the full name matches the full analyst name
                 OR the first name matches analyst[1] (a_firstname) AND last name matches analyst[2] (a_lastname), then count that request as being assigned to that analyst and do
@@ -255,6 +259,10 @@ For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#so
         End for
     End for
 ```
+
+**NOTES:**
+
+Refer to the NOTES under [**Unassigned Requests** section](#s8) regarding handling priority codes.
 
 ---
 
@@ -309,17 +317,15 @@ The `showForm()` function uses the `window.location` object to get the current p
 ```
 
 **NOTES:**
+
 Yes, I know this is ugly:
 ```
     <!--For finding priority request code-->
     {% set priorityCodeWord = namespace(word="None") %}
     {% if x[17] != None %}
-    {% set xpcid = x[17] %}
-    {% set xpcid = xpcid.strip() %}
+    {% set xpcid = x[17].strip() %}
     {% for pc in prioritydb %}
-    {% set pcid = pc[0] %}
-    {% set pcid = pcid.strip() %}
-    {% if xpcid == pcid %}
+    {% if xpcid == pc[0].strip() %}
     {% set priorityCodeWord.word = pc[1].strip() %}
     {% endif %}
     {% endfor %}
@@ -329,7 +335,7 @@ Yes, I know this is ugly:
 ```
 [('1 ', 'Critical  ', 'Immediate attention required. Like yesterday.', datetime.datetime(2019, 7, 10, 17, 3), '2019-07-17 16:52:00'), ('2 ', 'High      ', 'Address within one to five work days.', datetime.datetime(2019, 7, 17, 17, 0), '2019-07-17 17:00:00'), ('3 ', 'Normal    ', 'Due between three work days and three weeks.', datetime.datetime(2019, 7, 17, 17, 0), '2019-07-17 17:00:00'), ('4 ', 'Low       ', 'Likely take more than three weeks.', datetime.datetime(2019, 7, 17, 17, 1), '2019-07-17 17:01:00')]
 ```
-...so I wanted to strip off the whitespaces and ensure that in itself wouldn't mess up any original data (hence the many variables). Furthermore, `priorityCodeWord` is declared with namespace, as I found out that there are some scoping issues in Flask when trying to access variables outside the `for` loop. For this reason, you want to use `priorityCodeWord.word` to store the corresponding word for the priorityId. This can be done a bit more eloquently, so please feel free to condense the code here.
+...so I needed to strip off the whitespaces. `priorityCodeWord` is declared with namespace, as I found out that there are some scoping issues in Flask when trying to access variables outside the `for` loop. For this reason, you want to use `priorityCodeWord.word` to store the corresponding word for the priorityId. This can be done a bit more eloquently, so please feel free to condense the code here.
 
 ---
 
@@ -363,16 +369,16 @@ In `app.py`, before rendering the page, the formID is retrived from the `form` p
 formID = request.args.get('form')
 ```
 
-In `app.py`, the update() function, routed from clicking a "Submit" button on the form in `unassignedForm.html` will perform the actual inserting/updating of a row in the dbo.requests table.
+In `app.py`, the updateUnassigned() function, routed from clicking a "Submit" button on the form in `unassignedForm.html` will perform the actual inserting/updating of a row in the dbo.requests table.
 
 In `unassignedForm.html`...
 ```
-<form method="POST" action="./update">
+<form method="POST" action="./updateUnassigned">
 ```
 ...sends us to the function in `app.py`:
 ```
-@app.route("/update", methods=["POST"])
-def update():
+@app.route("/updateUnassigned", methods=["POST"])
+def updateUnassigned():
     formID = request.form.get("formID")
     newAssignedAnalyst = request.form.get("newAssignedAnalyst")
     newNotes = request.form.get("newNotes")
@@ -404,12 +410,13 @@ The various `request.form.get()` methods will retrieve form data, using them as 
 
             Create the form, displaying information about the request along with editable field(s).
 
-            Create a "submit" button that sends us to update() function, which handles the actual insert/update of a row in database - it will redirect back to unassigned.html
+            Create a "submit" button that sends us to updateUnassigned() function, which handles the actual insert/update of a row in database - it will redirect back to unassigned.html
         End if
     End for
 ```
 
 **NOTES:**
+
 Refer to the NOTES under [**Unassigned Requests** section](#s8) regarding handling priority codes.
 
 ---

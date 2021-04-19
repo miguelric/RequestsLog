@@ -20,6 +20,7 @@
 	</div>
 	<div class="col-sm-12">
 		<div class="col-sm-12 text-sm-center">
+			<div class="banner-heading">Requests with Status "Received"</div>
 
 			<!--TOP LEVEL: For each item (analyst) in the analystList, which was passed to this page by app.py-->
 			<!--For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort-->
@@ -80,6 +81,17 @@
 						{% set request_title = x[10] %}
 						{% endif %}
 
+						<!--For finding priority request code-->
+						{% set priorityCodeWord = namespace(word="None") %}
+						{% if x[17] != None %}
+						{% set xpcid = x[17].strip() %}
+						{% for pc in prioritydb %}
+						{% if xpcid == pc[0].strip() %}
+						{% set priorityCodeWord.word = pc[1].strip() %}
+						{% endif %}
+						{% endfor %}
+						{% endif %}
+
 						<div class="card-body">
 							<label for="title"><span>Request:</span></label><input type="text" id="title"
 								value="{{request_title}}" class="readonly-input-field" readonly>
@@ -90,7 +102,7 @@
 							<label for="requestor"><span>Requestor:</span></label><input type="text" id="requestor"
 								value="{{x[4]}}" class="readonly-input-field" readonly>
 							<label for="priority"><span>Priority:</span></label><input type="text" id="priority"
-								value="{{x[17]}}" class="readonly-input-field" readonly>
+								value="{{priorityCodeWord.word}}" class="readonly-input-field" readonly>
 							<label for="duedate"><span>Due Date:</span></label><input type="text" id="duedate"
 								value="{{x[3]}}" class="readonly-input-field" readonly>
 							<hr style="height:2px;border-width:0;color:gray;background-color:gray">
@@ -107,6 +119,112 @@
 
 		</div>
 	</div>
+
+
+	<!--UNDER REVIEW SECTION-->
+	<div class="col-sm-12">
+		<div class="col-sm-12 text-sm-center">
+			<div class="banner-heading" style="margin-top: 100px">Requests with Status "Under Review"</div>
+
+			<!--TOP LEVEL: For each item (analyst) in the analystList, which was passed to this page by app.py-->
+			<!--For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort-->
+			{% for analyst in analystList|sort(attribute="lastName") %}
+
+			{% set a_fullname = analyst[3] %}
+			{% set a_firstname = analyst[1] %}
+			{% set a_lastname = analyst[2] %}
+
+			<!--To calculate the number of requests per analyst-->
+			{% set total_req = namespace(value=0) %}
+			{% for x in reviewdb %}
+			<!--If an analyst exists for the request (value is not NULL)-->
+			{% if x[16] != None %}
+			{% set db_assignedTo = x[16] %}
+			<!--Split the first and last name so we can match against firstName and lastName column in assignedTo table-->
+			{% set splitname = db_assignedTo.split() %}
+			<!--Extra safety - if either the full name matches the full analyst name
+			OR the first name matches analyst[1] (a_firstname) AND last name matches analyst[2] (a_lastname),
+		    then count that request as being assigned to that analyst-->
+			{% if(( x[16] == a_fullname ) or ( a_lastname == splitname[1] and a_firstname == splitname[0] )) %}
+			{% set total_req.value = total_req.value + 1 %}
+			{% endif %}
+			{% endif %}
+			{% endfor %}
+
+			<!--Accordian structure-->
+			<div id="accordion2-{{ loop.index }}" role="tablist">
+				<div class="card">
+					<div class="card-header" role="tab" id="heading2-{{ loop.index }}">
+						<h5 class="mb-0">
+							<a class="collapsed" data-toggle="collapse" href="#collapse2-{{ loop.index }}"
+								aria-expanded="true" aria-controls="collapse2-{{ loop.index }}">
+								{{ a_lastname }}, {{ a_firstname }} | Total Requests: {{ total_req.value }}
+							</a>
+						</h5>
+					</div>
+
+					<div id="collapse2-{{ loop.index }}" class="collapse" role="tabpanel"
+						aria-labelledby="heading2-{{ loop.index }}" data-parent="#accordion2-{{ loop.index }}">
+						<!--Card subsection for every request matching the analyst-->
+						{% for x in reviewdb %}
+						<!--If an analyst exists for the request (value is not NULL)-->
+						{% if x[16] != None %}
+						{% set db_assignedTo = x[16] %}
+						<!--Split the first and last name so we can match against firstName and lastName column in assignedTo table-->
+						{% set splitname = db_assignedTo.split() %}
+						<!--Match the request to the analyst through their name-->
+						{% if(( x[16] == a_fullname ) or ( a_lastname == splitname[1] and a_firstname == splitname[0] ))
+						%}
+
+						<!--For fetching rqstTitle-->
+						{% if x[13] != None %}
+						{% set request_title = x[13] %}
+						{% endif %}
+						<!--If rqstTitle null, fetch rqstURL-->
+						{% if x[13] == None %}
+						{% set request_title = x[10] %}
+						{% endif %}
+
+						<!--For finding priority request code-->
+						{% set priorityCodeWord = namespace(word="None") %}
+						{% if x[17] != None %}
+						{% set xpcid = x[17].strip() %}
+						{% for pc in prioritydb %}
+						{% if xpcid == pc[0].strip() %}
+						{% set priorityCodeWord.word = pc[1].strip() %}
+						{% endif %}
+						{% endfor %}
+						{% endif %}
+
+						<div class="card-body">
+							<label for="title"><span>Request:</span></label><input type="text" id="title"
+								value="{{request_title}}" class="readonly-input-field" readonly>
+							<label for="description"><span>Description:</span></label><textarea id="description"
+								class="readonly-textarea-field" readonly>{{x[11]}}</textarea>
+							<label for="formid"><span>Request ID:</span></label><input type="text" id="formid"
+								value="{{x[1]}}" name="formID" class="readonly-input-field" readonly>
+							<label for="requestor"><span>Requestor:</span></label><input type="text" id="requestor"
+								value="{{x[4]}}" class="readonly-input-field" readonly>
+							<label for="priority"><span>Priority:</span></label><input type="text" id="priority"
+								value="{{priorityCodeWord.word}}" class="readonly-input-field" readonly>
+							<label for="duedate"><span>Due Date:</span></label><input type="text" id="duedate"
+								value="{{x[3]}}" class="readonly-input-field" readonly>
+							<hr style="height:2px;border-width:0;color:gray;background-color:gray">
+						</div>
+						{% endif %}
+						{% endif %}
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+
+			{% endfor %}
+
+
+		</div>
+	</div>
+
+
 </div>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
