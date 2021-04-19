@@ -1,6 +1,6 @@
 {% extends "site_base_layout.html" %}
 
-{% block title %}Unassigned{% endblock %}
+{% block title %}Update Status{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -19,10 +19,10 @@
         <h1>UTSA OIR Data Requests</h1>
         <p>Some description here</p>
     </div>
-    {% for x in db %}
+    {% for x in db and reviewdb %}
     {% if x[1] == formID %}
     <!--Specify that the form should post its data
-            to the /updateUnassigned route. We will also prepopulate the data.-->
+            to the /update route. We will also prepopulate the data.-->
 
     <!--For fetching rqstTitle-->
     {% if x[13] != None %}
@@ -46,8 +46,8 @@
     {% endif %}
 
     <div class="form-style-1">
-        <formtitle>Unassigned Request Form</formtitle>
-        <form method="POST" action="./updateUnassigned">
+        <formtitle>Status Update Form</formtitle>
+        <form method="POST" action="./updateStatus">
             <!--Requestor section-->
             <section>
                 <div class="form-style-1-heading">Requestor</div>
@@ -117,13 +117,9 @@
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <label for="assignanalyst"><span>Assign To:</span><select id="assignanalyst"
-                                    name="newAssignedAnalyst" class="select-field" style="width: 60%;">
-                                    <option value="{{x[16]}}">{{x[16]}}</option>
-                                    {% for analyst in analystList %}
-                                    <option value="{{analyst[3]}}">{{analyst[3]}}</option>
-                                    {% endfor %}
-                                </select></label>
+                            <label for="assignanalyst"><span>Assigned To:</span></label><input type="text"
+                                id="assignanalyst" value="{{x[16]}}" class="readonly-input-field" style="width: 60%;"
+                                readonly>
                         </div>
                     </div>
                     <br>
@@ -132,29 +128,11 @@
                     <label for="notes"><span>Notes:</span></label><textarea id="notes" value="{{x[19]}}" name="newNotes"
                         class="textarea-field">{{x[19]}}</textarea>
 
-                    <input type="submit" value="Update and Notify Analyst">
+                    <input type="submit" value="Update Status and/or Deadline">
                 </div>
             </section>
             <br><br><br>
 
-
-            <!--Assignment section-->
-            <!--<section>
-                <div class="form-style-1-heading">Assignment</div>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <label for="assignanalyst"><span>Assigned To:</span></label><input type="text"
-                                id="assignanalyst" value="{{x[16]}}" name="newAssignedAnalyst" class="input-field"
-                                style="width: 30%;">
-                            <input type="submit" value="Update and Notify Analyst">
-                        </div>
-                        <div class="col-sm-6">
-
-                        </div>
-                    </div>
-                </div>
-            </section>-->
         </form>
         {% endif %}
         {% endfor %}

@@ -95,6 +95,19 @@ body {
 	 color: #D9D9D9;
 }
 
+/**********Banner headings (i.e. for the accordians)**********/
+.banner-heading{
+	font-weight: bold;
+	font-style: italic;
+	border-bottom: 2px solid #ddd;
+	margin-bottom: 20px;
+	background:#0c2340;
+	color:#ff5500;
+	font-size: 20px;
+	padding: 6px;
+}
+
+
 /**********Site Forms*********/
 .form-style-1{
 	position: relative; 

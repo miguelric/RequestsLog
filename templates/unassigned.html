@@ -42,12 +42,9 @@
 								<!--For finding priority request code-->
 								{% set priorityCodeWord = namespace(word="None") %}
 								{% if x[17] != None %}
-								{% set xpcid = x[17] %}
-								{% set xpcid = xpcid.strip() %}
+								{% set xpcid = x[17].strip() %}
 								{% for pc in prioritydb %}
-								{% set pcid = pc[0] %}
-								{% set pcid = pcid.strip() %}
-								{% if xpcid == pcid %}
+								{% if xpcid == pc[0].strip() %}
 								{% set priorityCodeWord.word = pc[1].strip() %}
 								{% endif %}
 								{% endfor %}

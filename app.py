@@ -162,10 +162,12 @@ session = Session()
 
 
 # update the assigned analyst - routed from unassignedForm.html
-@app.route("/update", methods=["POST"])
-def update():
+@app.route("/updateUnassigned", methods=["POST"])
+def updateUnassigned():
     formID = request.form.get("formID")
     newAssignedAnalyst = request.form.get("newAssignedAnalyst")
+    newStatus = request.form.get("newStatus")
+    newPriority = request.form.get("newPriority")
     newNotes = request.form.get("newNotes")
 
     # Will print the raw SQL expression for querying database
@@ -174,7 +176,7 @@ def update():
     # Find the record in the database matching the request ID
 
     # Unexpected behavior?
-    #session.query(db_table).filter(db_table.requestId == 'formID').update({'assignedTo': newAssignedAnalyst})
+    #session.query(db_table).filter(db_table.requestId == 'formID').updateUnassigned({'assignedTo': newAssignedAnalyst})
     
     
     row = session.query(db_table).filter_by(requestId = formID).one()
@@ -183,6 +185,16 @@ def update():
         row.assignedTo = None
     else:
         row.assignedTo = newAssignedAnalyst
+    
+    if newStatus == "None" or not newStatus:
+        row.rqstStatus = None
+    else:
+        row.rqstStatus = newStatus
+    
+    if newPriority == "None" or not newPriority:
+        row.rqstPrioity = None
+    else:
+        row.rqstPrioity = newPriority
     
     if newNotes == "None" or not newNotes:
         row.notes = None
@@ -199,6 +211,53 @@ def update():
     
     
     return redirect("/unassigned")
+
+
+
+
+# update the status/deadline - routed from statusUpdateForm.html
+@app.route("/updateStatus", methods=["POST"])
+def updateStatus():
+    formID = request.form.get("formID")
+    newStatus = request.form.get("newStatus")
+    newPriority = request.form.get("newPriority")
+    newDeadline = request.form.get("newDeadline")
+    newNotes = request.form.get("newNotes")
+    
+    row = session.query(db_table).filter_by(requestId = formID).one()
+    
+
+    if newStatus == "None" or not newStatus:
+        row.rqstStatus = None
+    else:
+        row.rqstStatus = newStatus
+    
+    if newPriority == "None" or not newPriority:
+        row.rqstPrioity = None
+    else:
+        row.rqstPrioity = newPriority
+    
+    if newDeadline == "None" or not newDeadline:
+        row.dueDate = None
+    else:
+        row.dueDate = newDeadline
+    
+    if newNotes == "None" or not newNotes:
+        row.notes = None
+    else:
+        row.notes = newNotes
+    
+    session.add(row)
+    '''
+    sql = "UPDATE requests SET assignedTo = ?, notes = ? WHERE requestID = ?"
+    cursor.execute(sql, newAssignedAnalyst, newNotes, formID)
+    '''
+    session.commit()
+
+    
+    return redirect("/statusUpdate")
+
+
 
 #########################################
 
@@ -359,21 +418,33 @@ def assignedRequests():
     df = uniqueNames
     db = dic
 
+    # Re-fetch ALL requests that are under review (assignedRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
+    reviewdb = []
+    for row in cursor.fetchall():
+        reviewdb.append(row)
+
     # fetch ALL the analysts from the assignedTo table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
 
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
 
-    return render_template("assignedRequests.html", df = df, db = db, analystList = analystList)
+
+    return render_template("assignedRequests.html", df = df, db = db, reviewdb = reviewdb, analystList = analystList, prioritydb = prioritydb)
 
 
 
 @app.route('/unassigned')                                                   # url mapping main page
 def unassigned():
 
-    # Re-fetch ALL requests that are open (assignedRequests.html)
+    # Re-fetch ALL requests that are open
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
@@ -394,7 +465,7 @@ def unassigned():
 @app.route('/unassignedForm')                                                   # url mapping main page
 def unassignedForm():
 
-    # Re-fetch ALL requests that are open (assignedRequests.html)
+    # Re-fetch ALL requests that are open
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
@@ -416,14 +487,20 @@ def unassignedForm():
     for row in cursor.fetchall():
         prioritydb.append(row)
 
-    return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList, prioritydb = prioritydb)
+    # fetch the status code descriptions from the statusCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[statusCode]")
+    statusdb = []
+    for row in cursor.fetchall():
+        statusdb.append(row)
+
+    return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList, prioritydb = prioritydb, statusdb = statusdb)
 
 
 
 @app.route('/dueThisWeek')                                                   # url mapping main page
 def dueThisWeek():
 
-    # Re-fetch ALL requests that are open (assignedRequests.html)
+    # Re-fetch ALL requests that are open
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
@@ -441,15 +518,99 @@ def dueThisWeek():
 @app.route('/statusUpdate')                                                   # url mapping main page
 def statusUpdate():
 
-    # Re-fetch ALL requests that are open (assignedRequests.html)
+    # Re-fetch ALL requests that are open
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
     dic = []
     for row in cursor.fetchall():
         dic.append(row)
     
-    return render_template("statusUpdate.html")
+
+    df = uniqueNames
+    db = dic
 
 
+    # Re-fetch ALL requests that are under review (assignedRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
+    reviewdb = []
+    for row in cursor.fetchall():
+        reviewdb.append(row)
+
+
+    # fetch ALL the analysts from the assignedTo table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    analystList = []
+    for row in cursor.fetchall():
+        analystList.append(row)
+
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
+
+
+    return render_template("statusUpdate.html", df = df, db = db, reviewdb = reviewdb, analystList = analystList, prioritydb = prioritydb)
+
+
+
+@app.route('/statusUpdateForm')                                                   # url mapping main page
+def statusUpdateForm():
+
+    # Re-fetch ALL requests that are open
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    dic = []
+    for row in cursor.fetchall():
+        dic.append(row)
+
+    df = uniqueNames
+    db = dic
+    formID = request.args.get('form')
+
+    # Re-fetch ALL requests that are under review
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
+    reviewdb = []
+    for row in cursor.fetchall():
+        reviewdb.append(row)
+ 
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
+
+    # fetch the status code descriptions from the statusCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[statusCode]")
+    statusdb = []
+    for row in cursor.fetchall():
+        statusdb.append(row)
+
+    return render_template("statusUpdateForm.html", df = df, db = db, reviewdb = reviewdb, formID = formID, prioritydb = prioritydb, statusdb = statusdb)
+
+
+
+@app.route('/completedRequests')                                                   # url mapping main page
+def completedRequests():
+
+    # Fetch ALL requests that are COMPLETED
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Completed';")
+    completeddb = []
+    for row in cursor.fetchall():
+        completeddb.append(row)
+
+    # fetch ALL the analysts from the assignedTo table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    analystList = []
+    for row in cursor.fetchall():
+        analystList.append(row)
+
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
+
+
+    return render_template("completedRequests.html", completeddb = completeddb, analystList = analystList, prioritydb = prioritydb)
 
 
 
