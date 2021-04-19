@@ -130,9 +130,11 @@ def assignedRequests():
 
 ### Handling columns <a name="s5"/>
 Columns of dbo.requests table are as listed:
+
 ![Columns in dbo.requests](/README-images/dbo.requests-columns.JPG)
 
 Columns of dbo.assignedTo table are:
+
 ![Columns in dbo.assignedTo](/README-images/dbo.assignedTo-columns.JPG)
 
 Since the rows and their metadata of a specified database table are stored is list of tuples (i.e. `{% for x in db %}` is so that `x` represents a tuple), we can use the index operator `[]` to access an item in the tuple i.e. whatever column value of the row you want to access.
@@ -260,7 +262,7 @@ For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#so
 This page displays all unassigned requests.
 From `app.py`, we render this page using 
 ```
-return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList)
+return render_template("unassigned.html", df = df, db = db, prioritydb = prioritydb)
 ```
 
 **Variables**
@@ -270,7 +272,9 @@ return render_template("unassignedForm.html", df = df, db = db, formID = formID,
 | `df`              | Set to a unique list of analyst names for using/testing graphs. No use in individual page. |
 | `db`              | List of tuples representing all requests/metadata in dbo.requests |
 | `analystList`     | List of tuples representing all analysts/metadata in dbo.assignedTo |
+| `prioritydb`  | List of tuples representing all priority codes/metadata in dbo.priorityCode |
 | `unassignedID`    | Set to value of 2nd column (requestId) in dbo.assignedTo; used in `showForm()` function |
+| `priorityCodeWord`     | set to value of 2nd column in dbo.priorityCode according to the priorityId of the request |
 
 
 **Functions**
@@ -294,6 +298,8 @@ The `showForm()` function uses the `window.location` object to get the current p
         If an analyst DOES NOT exist for the request (value of seventeenth column is NULL) do
             Set request_title to rqstTitle or rqstURL column. (the columns rqstTitle and rqstURL have been confused with each other in the original database, so we have to check which one to use).
 
+            Match the priorityId of the request (given by x[17]) to the priorityId in dbo.priorityCode so that we can get a useful description of the code (in words, not numbers).
+
             Create the accordian card that displays information about the request.
 
             Create the button that redirects to the unassigned request form page (unassignedForm.html), passing the unassignedID of a respective request.
@@ -302,6 +308,29 @@ The `showForm()` function uses the `window.location` object to get the current p
 
 ```
 
+**NOTES:**
+Yes, I know this is ugly:
+```
+    <!--For finding priority request code-->
+    {% set priorityCodeWord = namespace(word="None") %}
+    {% if x[17] != None %}
+    {% set xpcid = x[17] %}
+    {% set xpcid = xpcid.strip() %}
+    {% for pc in prioritydb %}
+    {% set pcid = pc[0] %}
+    {% set pcid = pcid.strip() %}
+    {% if xpcid == pcid %}
+    {% set priorityCodeWord.word = pc[1].strip() %}
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+```
+...but I wanted to air on the safe-ish side when dealing with these variables in particular. The dbo.priorityCode is not exactly friendly; in particular, you can see that there are some whitespaces, e.g. "1 ":
+```
+[('1 ', 'Critical  ', 'Immediate attention required. Like yesterday.', datetime.datetime(2019, 7, 10, 17, 3), '2019-07-17 16:52:00'), ('2 ', 'High      ', 'Address within one to five work days.', datetime.datetime(2019, 7, 17, 17, 0), '2019-07-17 17:00:00'), ('3 ', 'Normal    ', 'Due between three work days and three weeks.', datetime.datetime(2019, 7, 17, 17, 0), '2019-07-17 17:00:00'), ('4 ', 'Low       ', 'Likely take more than three weeks.', datetime.datetime(2019, 7, 17, 17, 1), '2019-07-17 17:01:00')]
+```
+...so I wanted to strip off the whitespaces and ensure that in itself wouldn't mess up any original data (hence the many variables). Furthermore, `priorityCodeWord` is declared with namespace, as I found out that there are some scoping issues in Flask when trying to access variables outside the `for` loop. For this reason, you want to use `priorityCodeWord.word` to store the corresponding word for the priorityId. This can be done a bit more eloquently, so please feel free to condense the code here.
+
 ---
 
 ### Form for an Unassigned Request <a name="s9"/>
@@ -309,7 +338,7 @@ This page displays the form for a specific unassigned request, with editable fie
 
 From `app.py`, we render this page using: 
 ```
-return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList)
+ return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList, prioritydb = prioritydb)
 ```
 
 **Variables**
@@ -318,7 +347,9 @@ return render_template("unassignedForm.html", df = df, db = db, formID = formID,
 | `df`                | Set to a unique list of analyst names for using/testing graphs. No use in individual page. |
 | `db`                | List of tuples representing all requests/metadata in dbo.requests |
 | `analystList`       | List of tuples representing all analysts/metadata in dbo.assignedTo |
-| `formID`            | passed to parameter `form` in URL to associate a unique form to a specific request |
+| `prioritydb`  | List of tuples representing all priority codes/metadata in dbo.priorityCode |
+| `formID`            | passed to parameter `form` in URL to associate a unique form to a specific request 
+| `priorityCodeWord`     | set to value of 2nd column in dbo.priorityCode according to the priorityId of the request |
 | `newAssignedAnalyst`| set to value of selected analyst in form |
 | `newNotes`          | set to value of notes field in form |
 | `request_title`     | set to value of 14th column (rqstTitle) OR 11th column (rqstURL) in dbo.requests |
@@ -368,6 +399,8 @@ The various `request.form.get()` methods will retrieve form data, using them as 
     For each request in the table dbo.requests do
         If the second column (requestId) matches formID (the id of the request that was clicked on from unassigned.html)
             Set request_title to rqstTitle or rqstURL column. (the columns rqstTitle and rqstURL have been confused with each other in the original database, so we have to check which one to use).
+            
+            Match the priorityId of the request (given by x[17]) to the priorityId in dbo.priorityCode so that we can get a useful description of the code (in words, not numbers).
 
             Create the form, displaying information about the request along with editable field(s).
 
@@ -375,6 +408,9 @@ The various `request.form.get()` methods will retrieve form data, using them as 
         End if
     End for
 ```
+
+**NOTES:**
+Refer to the NOTES under [**Unassigned Requests** section](#s8) regarding handling priority codes.
 
 ---
 

@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+
 <!-- begin page content -->
 <div class="row">
 
@@ -30,6 +31,21 @@
     <!--If rqstTitle null, fetch rqstURL-->
     {% if x[13] == None %}
     {% set request_title = x[10] %}
+    {% endif %}
+
+
+    <!--For finding priority request code-->
+    {% set priorityCodeWord = namespace(word="None") %}
+    {% if x[17] != None %}
+    {% set xpcid = x[17] %}
+    {% set xpcid = xpcid.strip() %}
+    {% for pc in prioritydb %}
+    {% set pcid = pc[0] %}
+    {% set pcid = pcid.strip() %}
+    {% if xpcid == pcid %}
+    {% set priorityCodeWord.word = pc[1].strip() %}
+    {% endif %}
+    {% endfor %}
     {% endif %}
 
     <div class="form-style-1">
@@ -86,8 +102,8 @@
                                 </div>
                                 <div class="col-sm">
                                     <label for="priority"><span style="width: 60px;">Priority:</span></label><input
-                                        type="text" id="priority" value="{{x[17]}}" class="readonly-input-field"
-                                        style="width: 50%;" readonly>
+                                        type="text" id="priority" value="{{priorityCodeWord.word}}"
+                                        class="readonly-input-field" style="width: 50%;" readonly>
                                 </div>
                             </div>
                         </div>

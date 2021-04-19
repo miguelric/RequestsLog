@@ -382,7 +382,13 @@ def unassigned():
     df = uniqueNames
     db = dic
 
-    return render_template("unassigned.html", df = df, db = db)
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
+
+    return render_template("unassigned.html", df = df, db = db, prioritydb = prioritydb)
 
 
 @app.route('/unassignedForm')                                                   # url mapping main page
@@ -404,7 +410,13 @@ def unassignedForm():
     for row in cursor.fetchall():
         analystList.append(row)
 
-    return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList)
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
+
+    return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList, prioritydb = prioritydb)
 
 
 
