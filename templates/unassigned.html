@@ -38,6 +38,20 @@
 								{% if x[13] == None %}
 								{{x[10]}}
 								{% endif %}
+
+								<!--For finding priority request code-->
+								{% set priorityCodeWord = namespace(word="None") %}
+								{% if x[17] != None %}
+								{% set xpcid = x[17] %}
+								{% set xpcid = xpcid.strip() %}
+								{% for pc in prioritydb %}
+								{% set pcid = pc[0] %}
+								{% set pcid = pcid.strip() %}
+								{% if xpcid == pcid %}
+								{% set priorityCodeWord.word = pc[1].strip() %}
+								{% endif %}
+								{% endfor %}
+								{% endif %}
 							</a>
 						</h5>
 					</div>
@@ -53,7 +67,7 @@
 							<label for="requestor"><span>Requestor:</span></label><input type="text" id="requestor"
 								value="{{x[4]}}" class="readonly-input-field" readonly>
 							<label for="priority"><span>Priority:</span></label><input type="text" id="priority"
-								value="{{x[17]}}" class="readonly-input-field" readonly>
+								value="{{priorityCodeWord.word}}" class="readonly-input-field" readonly>
 							<label for="duedate"><span>Due Date:</span></label><input type="text" id="duedate"
 								value="{{x[3]}}" class="readonly-input-field" readonly>
 
