@@ -19,7 +19,7 @@
         <h1>UTSA OIR Data Requests</h1>
         <p>Some description here</p>
     </div>
-    {% for x in db and reviewdb %}
+    {% for x in db_and_reviewdb%}
     {% if x[1] == formID %}
     <!--Specify that the form should post its data
             to the /update route. We will also prepopulate the data.-->

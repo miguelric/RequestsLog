@@ -99,14 +99,62 @@ body {
 .banner-heading{
 	font-weight: bold;
 	font-style: italic;
-	border-bottom: 2px solid #ddd;
-	margin-bottom: 20px;
+	border-bottom: 0px solid #ddd;
+	margin-bottom: 0px;
 	background:#0c2340;
 	color:#ff5500;
 	font-size: 20px;
 	padding: 6px;
 }
+/************Table stylings (e.g. Unassigned Page Analysts and their Assignments Table)**********/
+table.assignedTable, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
 
+table.assignedTable {
+	border: 4px solid #0C2340;
+	background-color: #E8E8E8;
+	width: 100%;
+	text-align: left;
+	border-collapse: collapse;
+  }
+  table.assignedTable td, table.assignedTable th {
+	border: 0px;
+	padding: 3px 8px;
+  }
+  table.assignedTable tbody td {
+	font-size: 18px;
+	color: #02010B;
+  }
+  table.assignedTable tr:nth-child(even) {
+	background: #D8D8F1;
+  }
+  table.assignedTable thead {
+	background: #343D47;
+	width: 100%;
+  }
+  table.assignedTable thead.banner-heading {
+	background: #343D47;
+  }
+  table.assignedTable thead th {
+	font-size: 16px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-align: left;
+	border: 4px solid #343D47;
+  }
+
+table.assignedTable th:last-child, table.assignedTable td:last-child {
+    text-align: right;
+}
+
+table.assignedTable td {
+	width: 200px;
+}
+table.assignedTable td+td {
+	width: auto;
+}
 
 /**********Site Forms*********/
 .form-style-1{

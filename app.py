@@ -453,13 +453,25 @@ def unassigned():
     df = uniqueNames
     db = dic
 
+    # fetch ALL the analysts from the assignedTo table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    analystList = []
+    for row in cursor.fetchall():
+        analystList.append(row)
+
+    # Fetch ALL requests that are under review AND received
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' OR rqstStatus = 'Received';")
+    db_and_reviewdb = []
+    for row in cursor.fetchall():
+        db_and_reviewdb.append(row)
+
     # fetch the priority code descriptions from the priorityCode table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
 
-    return render_template("unassigned.html", df = df, db = db, prioritydb = prioritydb)
+    return render_template("unassigned.html", df = df, db = db, analystList = analystList, db_and_reviewdb = db_and_reviewdb, prioritydb = prioritydb)
 
 
 @app.route('/unassignedForm')                                                   # url mapping main page
@@ -508,8 +520,37 @@ def dueThisWeek():
 
     df = uniqueNames
     db = thisWeekDict
+
+    # fetch ALL the analysts from the assignedTo table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    analystList = []
+    for row in cursor.fetchall():
+        analystList.append(row)
+
+    current_date = datetime.date.today()
+    #print(current_date)
+
+    # fetch the requests with "Received" status that are due in some range from current date/time
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND DATEDIFF(DAY, dueDate, GETDATE()) >= 0 AND DATEDIFF(DAY, dueDate, GETDATE()) <= 900;")
+    due_this_week_db = []
+    for row in cursor.fetchall():
+        due_this_week_db.append(row)
+
+    #print(due_this_week_db)
+    
+    # fetch the requests with "Under Review" status that are due in some range from current date/time
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' AND DATEDIFF(DAY, dueDate, GETDATE()) >= 0 AND DATEDIFF(DAY, dueDate, GETDATE()) <= 900;")
+    due_this_week_reviewdb = []
+    for row in cursor.fetchall():
+        due_this_week_reviewdb.append(row)
+
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
  
-    return render_template("dueThisWeek.html", df = df, db = db)
+    return render_template("dueThisWeek.html", df = df, db = db, analystList = analystList, current_date = current_date, due_this_week_db = due_this_week_db, due_this_week_reviewdb = due_this_week_reviewdb, prioritydb = prioritydb)
 
 
 
@@ -556,21 +597,14 @@ def statusUpdate():
 @app.route('/statusUpdateForm')                                                   # url mapping main page
 def statusUpdateForm():
 
-    # Re-fetch ALL requests that are open
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
-    dic = []
-    for row in cursor.fetchall():
-        dic.append(row)
-
-    df = uniqueNames
-    db = dic
+    
     formID = request.args.get('form')
 
-    # Re-fetch ALL requests that are under review
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
-    reviewdb = []
+    # Fetch ALL requests that are under review AND received
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' OR rqstStatus = 'Received';")
+    db_and_reviewdb = []
     for row in cursor.fetchall():
-        reviewdb.append(row)
+        db_and_reviewdb.append(row)
  
     # fetch the priority code descriptions from the priorityCode table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
@@ -584,7 +618,7 @@ def statusUpdateForm():
     for row in cursor.fetchall():
         statusdb.append(row)
 
-    return render_template("statusUpdateForm.html", df = df, db = db, reviewdb = reviewdb, formID = formID, prioritydb = prioritydb, statusdb = statusdb)
+    return render_template("statusUpdateForm.html", db_and_reviewdb = db_and_reviewdb, formID = formID, prioritydb = prioritydb, statusdb = statusdb)
 
 
 
