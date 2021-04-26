@@ -18,7 +18,7 @@
 		<h1>UTSA OIR Data Requests</h1>
 		<p>Unassigned Requests</p>
 	</div>
-	<div class="col-sm-12">
+	<div class="col-sm-8">
 		<div class="col-sm-12 text-sm-center">
 			{% for x in db %}
 			{% if x[16] == None %}
@@ -86,6 +86,55 @@
 			{% endif %}
 			{% endfor %}
 
+		</div>
+	</div>
+	<!--Second panel - show current jobs/workload for each analyst-->
+	<div class="col-sm-4">
+		<div class="col-sm-12">
+			<table class="assignedTable">
+				<colgroup>
+					<col>
+					<col>
+					<!--<thead class="banner-heading">
+					<tr>
+						<th>Currently Assigned Requests
+					</tr>
+				</thead>-->
+				<thead>
+					<tr>
+						<th>Analyst
+						<th>Number of Requests
+				</thead>
+				<tbody>
+					<!--TOP LEVEL: For each item (analyst) in the analystList, which was passed to this page by app.py-->
+					<!--For sorting reference: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort-->
+					{% for analyst in analystList|sort(attribute="lastName") %}
+
+					{% set a_fullname = analyst[3] %}
+					{% set a_firstname = analyst[1] %}
+					{% set a_lastname = analyst[2] %}
+
+					<!--To calculate the number of requests per analyst-->
+					{% set total_req = namespace(value=0) %}
+					{% for x in db_and_reviewdb %}
+					<!--If an analyst exists for the request (value is not NULL)-->
+					{% if x[16] != None %}
+					{% set db_assignedTo = x[16] %}
+					<!--Split the first and last name so we can match against firstName and lastName column in assignedTo table-->
+					{% set splitname = db_assignedTo.split() %}
+					<!--Extra safety - if either the full name matches the full analyst name
+			OR the first name matches analyst[1] (a_firstname) AND last name matches analyst[2] (a_lastname),
+		    then count that request as being assigned to that analyst-->
+					{% if(( x[16] == a_fullname ) or ( a_lastname == splitname[1] and a_firstname == splitname[0] )) %}
+					{% set total_req.value = total_req.value + 1 %}
+					{% endif %}
+					{% endif %}
+					{% endfor %}
+					<tr>
+						<td>{{a_lastname}}, {{a_firstname}}
+						<td>{{total_req.value}}
+							{% endfor %}
+			</table>
 		</div>
 	</div>
 </div>
