@@ -1,14 +1,16 @@
-
 from flask import Flask, render_template, url_for, request           # Library Imports
 import sqlalchemy as sa
+from sqlalchemy import and_
 from sqlalchemy import create_engine
 ### New imports ###
 from sqlalchemy import Column, String
 from sqlalchemy.orm import Session, sessionmaker, mapper
-from flask import redirect
+from flask import flash, redirect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.automap import automap_base
-######
+from wtforms import Form, StringField, SelectField
+from flask_table import Table, Col
+###################
 import pandas as pd
 import pyodbc
 import matplotlib.pyplot as plt
@@ -40,8 +42,11 @@ endDate = endDate.strftime("%Y-%m-%d")
 nextWeek = nextWeek.strftime("%Y-%m-%d")
 """
 
-app = Flask(__name__)                                                # define our application
-   
+# Define application
+app = Flask(__name__) 
+# Used for flash() function
+app.secret_key = '123' 
+
 # Connect to DB using pyodbc to get all data into a list
 cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV;""Database=IR_dataRequests;""Trusted_Connection=yes;")
 cursor = cnxn.cursor()
@@ -159,8 +164,76 @@ class db_table(Base):
 
 Base.prepare(engine, reflect=True)
 session = Session()
+#######################################
 
 
+
+
+# Search functions
+#######################################
+# 
+class SearchForm(Form):
+    search1 = StringField('')
+    search2 = StringField('')
+    search3 = StringField('')
+    search4 = StringField('')
+
+
+class Results(Table):
+    id = Col('id')
+    requestId = Col('requestId')
+    dateSubmitted = Col('dateSubmitted')
+    dueDate = Col('dueDate')
+    rqstBy = Col('rqstBy')
+    rqstBy_title = Col('rqstBy_title')
+    rqstBy_affiliation = Col('rqstBy_affiliation')
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    search = SearchForm(request.form)
+    if request.method == 'POST':
+        return search_results(search)
+    return render_template('search.html', form=search)
+
+########################################
+@app.route('/results')
+def search_results(search):
+    results = []
+    filters = []
+    id_input = search.data['search1']
+    requestId_input = search.data['search2']
+    requestor_input = search.data['search3']
+    affiliation_input = search.data['search4']
+    if id_input:
+        filters.append(db_table.id.contains(id_input))
+    if requestId_input:
+        filters.append(db_table.requestId.contains(requestId_input))
+    if requestor_input:
+        filters.append(db_table.rqstBy.contains(requestor_input))
+    if affiliation_input:
+        filters.append(db_table.rqstBy_affiliation.contains(affiliation_input))
+    
+    results = session.query(db_table).filter(and_(*filters)).all()
+    
+    if not results:
+        flash('No results found!')
+        #print('No results found!')
+        return redirect('/search')
+    else:
+        # display results
+        table = Results(results)
+        table.border = True
+        return render_template('results.html', results=results, table=table)
+        #return render_template('results.html', results=results)
+
+########################################
+
+
+
+
+# Update functions
+########################################
 # update the assigned analyst - routed from unassignedForm.html
 @app.route("/updateUnassigned", methods=["POST"])
 def updateUnassigned():
@@ -212,9 +285,6 @@ def updateUnassigned():
     
     return redirect("/unassigned")
 
-
-
-
 # update the status/deadline - routed from statusUpdateForm.html
 @app.route("/updateStatus", methods=["POST"])
 def updateStatus():
@@ -257,12 +327,10 @@ def updateStatus():
     
     return redirect("/statusUpdate")
 
-
-
 #########################################
 
 
-'''
+
 my_path = 'static/barGraphs/'
 
 # Export bar graph for each analyst to barGraphs folder
@@ -289,8 +357,8 @@ for x in myDict:
     fig.savefig(os.path.join(my_path, name))   
 
 
-'''
-'''
+
+
 
 
 # Exporting main graph into barGraphs directory
@@ -317,7 +385,7 @@ fig.savefig(os.path.join(my_path, 'mainGraph'))
 
 
 
-'''
+
 
 
 
@@ -387,38 +455,31 @@ def plot_png():
 
 
 
-@app.route('/')                                                   # url mapping main page
+# URL Routes
+###################################
+@app.route('/')
 def homepage():
 
     # With the database being updated from within this app, as well as any queries/updates/deletes/adds that
     # happen through SSMS or other clients, it is safer to re-fetch the database on page load.
-    # Re-fetch ALL requests that are open (assignedRequests.html)
-    dic = []
+    # fetch ALL requests that are open
+    db = []
     for row in cursor.fetchall():
-        dic.append(row)
-
-    df = uniqueNames
-    db = dic
-
-    df = uniqueNames
-    db = dic
+        db.append(row)
  
-    return render_template("index.html", df = df, db = db)
+    return render_template("index.html", db = db)
 
 
-@app.route('/assignedRequests')                                                   # url mapping main page
+@app.route('/assignedRequests')
 def assignedRequests():
 
-    # Re-fetch ALL requests that are open (assignedRequests.html)
+    # fetch ALL requests that are received (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
-    dic = []
+    db = []
     for row in cursor.fetchall():
-        dic.append(row)
+        db.append(row)
 
-    df = uniqueNames
-    db = dic
-
-    # Re-fetch ALL requests that are under review (assignedRequests.html)
+    # fetch ALL requests that are under review (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
     reviewdb = []
     for row in cursor.fetchall():
@@ -437,21 +498,18 @@ def assignedRequests():
         prioritydb.append(row)
 
 
-    return render_template("assignedRequests.html", df = df, db = db, reviewdb = reviewdb, analystList = analystList, prioritydb = prioritydb)
+    return render_template("assignedRequests.html", db = db, reviewdb = reviewdb, analystList = analystList, prioritydb = prioritydb)
 
 
 
-@app.route('/unassigned')                                                   # url mapping main page
+@app.route('/unassigned')                                                  
 def unassigned():
 
-    # Re-fetch ALL requests that are open
+    # fetch ALL requests that are received
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
-    dic = []
+    db = []
     for row in cursor.fetchall():
-        dic.append(row)
-
-    df = uniqueNames
-    db = dic
+        db.append(row)
 
     # fetch ALL the analysts from the assignedTo table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
@@ -459,7 +517,7 @@ def unassigned():
     for row in cursor.fetchall():
         analystList.append(row)
 
-    # Fetch ALL requests that are under review AND received
+    # fetch ALL requests that are under review AND received
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' OR rqstStatus = 'Received';")
     db_and_reviewdb = []
     for row in cursor.fetchall():
@@ -471,20 +529,18 @@ def unassigned():
     for row in cursor.fetchall():
         prioritydb.append(row)
 
-    return render_template("unassigned.html", df = df, db = db, analystList = analystList, db_and_reviewdb = db_and_reviewdb, prioritydb = prioritydb)
+    return render_template("unassigned.html", db = db, analystList = analystList, db_and_reviewdb = db_and_reviewdb, prioritydb = prioritydb)
 
 
-@app.route('/unassignedForm')                                                   # url mapping main page
+@app.route('/unassignedForm')                                                  
 def unassignedForm():
 
-    # Re-fetch ALL requests that are open
+    # fetch ALL requests that are received
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
-    dic = []
+    db = []
     for row in cursor.fetchall():
-        dic.append(row)
+        db.append(row)
 
-    df = uniqueNames
-    db = dic
     formID = request.args.get('form')
  
     # fetch ALL the analysts from the assignedTo table
@@ -505,21 +561,18 @@ def unassignedForm():
     for row in cursor.fetchall():
         statusdb.append(row)
 
-    return render_template("unassignedForm.html", df = df, db = db, formID = formID, analystList = analystList, prioritydb = prioritydb, statusdb = statusdb)
+    return render_template("unassignedForm.html", db = db, formID = formID, analystList = analystList, prioritydb = prioritydb, statusdb = statusdb)
 
 
 
-@app.route('/dueThisWeek')                                                   # url mapping main page
+@app.route('/dueThisWeek')                                                  
 def dueThisWeek():
 
-    # Re-fetch ALL requests that are open
+    # fetch ALL requests that are received
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
-    dic = []
+    db = []
     for row in cursor.fetchall():
-        dic.append(row)
-
-    df = uniqueNames
-    db = thisWeekDict
+        db.append(row)
 
     # fetch ALL the analysts from the assignedTo table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
@@ -535,8 +588,6 @@ def dueThisWeek():
     due_this_week_db = []
     for row in cursor.fetchall():
         due_this_week_db.append(row)
-
-    #print(due_this_week_db)
     
     # fetch the requests with "Under Review" status that are due in some range from current date/time
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' AND DATEDIFF(DAY, dueDate, GETDATE()) >= 0 AND DATEDIFF(DAY, dueDate, GETDATE()) <= 900;")
@@ -550,27 +601,22 @@ def dueThisWeek():
     for row in cursor.fetchall():
         prioritydb.append(row)
  
-    return render_template("dueThisWeek.html", df = df, db = db, analystList = analystList, current_date = current_date, due_this_week_db = due_this_week_db, due_this_week_reviewdb = due_this_week_reviewdb, prioritydb = prioritydb)
+    return render_template("dueThisWeek.html", db = db, analystList = analystList, current_date = current_date, due_this_week_db = due_this_week_db, due_this_week_reviewdb = due_this_week_reviewdb, prioritydb = prioritydb)
 
 
 
 
 
-@app.route('/statusUpdate')                                                   # url mapping main page
+@app.route('/statusUpdate')
 def statusUpdate():
 
-    # Re-fetch ALL requests that are open
+    # fetch ALL requests that are received
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
-    dic = []
+    db = []
     for row in cursor.fetchall():
-        dic.append(row)
-    
+        db.append(row)
 
-    df = uniqueNames
-    db = dic
-
-
-    # Re-fetch ALL requests that are under review (assignedRequests.html)
+    # fetch ALL requests that are under review
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
     reviewdb = []
     for row in cursor.fetchall():
@@ -590,17 +636,17 @@ def statusUpdate():
         prioritydb.append(row)
 
 
-    return render_template("statusUpdate.html", df = df, db = db, reviewdb = reviewdb, analystList = analystList, prioritydb = prioritydb)
+    return render_template("statusUpdate.html", db = db, reviewdb = reviewdb, analystList = analystList, prioritydb = prioritydb)
 
 
 
-@app.route('/statusUpdateForm')                                                   # url mapping main page
+@app.route('/statusUpdateForm')                                            
 def statusUpdateForm():
 
     
     formID = request.args.get('form')
 
-    # Fetch ALL requests that are under review AND received
+    # fetch ALL requests that are under review AND received
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' OR rqstStatus = 'Received';")
     db_and_reviewdb = []
     for row in cursor.fetchall():
@@ -622,10 +668,10 @@ def statusUpdateForm():
 
 
 
-@app.route('/completedRequests')                                                   # url mapping main page
+@app.route('/completedRequests')                                                  
 def completedRequests():
 
-    # Fetch ALL requests that are COMPLETED
+    # fetch ALL requests that are COMPLETED
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Completed';")
     completeddb = []
     for row in cursor.fetchall():
@@ -647,8 +693,8 @@ def completedRequests():
     return render_template("completedRequests.html", completeddb = completeddb, analystList = analystList, prioritydb = prioritydb)
 
 
+################################
 
 
-
-if __name__ == "__main__":                                        # Used for debugging
+if __name__ == "__main__":
     app.run(debug=True)

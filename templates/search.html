@@ -1,0 +1,41 @@
+{% extends "site_base_layout.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<!-- begin page content -->
+<div class="row">
+    <image src="{{ url_for('static', filename = 'images/rowdy.png'   )}}" width=10% href="/">
+        <div class="col-sm-12">
+            <h1>UTSA OIR Data Requests</h1>
+            <p>Search through all Requests</p>
+        </div>
+        <div class="col-sm-12">
+            <div class="col-sm-12 text-sm-center">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                    {{ message }}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+                {% from "_searchhelper.html" import render_field %}
+                <form method="post">
+                    {{ render_field(form.search1) }}
+                    {{ render_field(form.search2) }}
+                    {{ render_field(form.search3) }}
+                    {{ render_field(form.search4) }}
+                    <p><input type="submit" value="Search">
+                    </p>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- end page content -->
+{% endblock %}
