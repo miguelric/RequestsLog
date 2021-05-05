@@ -25,25 +25,14 @@
             to the /updateUnassigned route. We will also prepopulate the data.-->
 
     <!--For fetching rqstTitle-->
-    {% if x[13] != None %}
-    {% set request_title = x[13] %}
-    {% endif %}
-    <!--If rqstTitle null, fetch rqstURL-->
-    {% if x[13] == None %}
-    {% set request_title = x[10] %}
-    {% endif %}
-
+    {% set request_title = namespace(word="None") %}
+    {% from "_titlePChelper.html" import find_request_title %}
+    {{ find_request_title(x, request_title) }}
 
     <!--For finding priority request code-->
     {% set priorityCodeWord = namespace(word="None") %}
-    {% if x[17] != None %}
-    {% set xpcid = x[17].strip() %}
-    {% for pc in prioritydb %}
-    {% if xpcid == pc[0].strip() %}
-    {% set priorityCodeWord.word = pc[1].strip() %}
-    {% endif %}
-    {% endfor %}
-    {% endif %}
+    {% from "_titlePChelper.html" import find_PC_word %}
+    {{ find_PC_word(x, priorityCodeWord, prioritydb) }}
 
     <div class="form-style-1">
         <formtitle>Unassigned Request Form</formtitle>

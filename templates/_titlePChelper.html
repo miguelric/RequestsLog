@@ -1,0 +1,24 @@
+{% macro find_request_title(x, request_title) %}
+<!--For fetching rqstTitle-->
+{% if x[13] != None %}
+{% set request_title.word = x[13] %}
+{% endif %}
+<!--If rqstTitle null, fetch rqstURL-->
+{% if x[13] == None %}
+{% set request_title.word = x[10] %}
+{% endif %}
+{% endmacro %}
+
+
+
+{% macro find_PC_word(x, priorityCodeWord, prioritydb) %}
+<!--For finding priority request code-->
+{% if x[17] != None %}
+{% set xpcid = x[17].strip() %}
+{% for pc in prioritydb %}
+{% if xpcid == pc[0].strip() %}
+{% set priorityCodeWord.word = pc[1].strip() %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endmacro %}

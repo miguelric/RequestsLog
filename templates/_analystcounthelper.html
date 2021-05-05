@@ -1,0 +1,17 @@
+{% macro sum_up_requests_for_each_analyst(database, total_req, a_fullname, a_firstname, a_lastname) %}
+<!--To calculate the number of requests per analyst-->
+{% for x in database %}
+<!--If an analyst exists for the request (value is not NULL)-->
+{% if x[16] != None %}
+{% set db_assignedTo = x[16] %}
+<!--Split the first and last name so we can match against firstName and lastName column in assignedTo table-->
+{% set splitname = db_assignedTo.split() %}
+<!--Extra safety - if either the full name matches the full analyst name
+			OR the first name matches analyst[1] (a_firstname) AND last name matches analyst[2] (a_lastname),
+		    then count that request as being assigned to that analyst-->
+{% if(( x[16] == a_fullname ) or ( a_lastname == splitname[1] and a_firstname == splitname[0] )) %}
+{% set total_req.value = total_req.value + 1 %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endmacro %}
