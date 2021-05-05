@@ -171,12 +171,12 @@ session = Session()
 
 # Search functions
 #######################################
-# 
+# https://wtforms.readthedocs.io/en/2.3.x/fields/
 class SearchForm(Form):
-    search1 = StringField('')
-    search2 = StringField('')
-    search3 = StringField('')
-    search4 = StringField('')
+    search1 = StringField(label="ID")
+    search2 = StringField(label="RequestID")
+    search3 = StringField(label="Requestor")
+    search4 = StringField(label="Requestor Affiliation")
 
 
 class Results(Table):
