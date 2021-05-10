@@ -9,7 +9,7 @@ from flask import flash, redirect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.automap import automap_base
 from wtforms import Form, StringField, SelectField
-from flask_table import Table, Col
+from flask_table import Table, Col, ButtonCol
 ###################
 import pandas as pd
 import pyodbc
@@ -173,20 +173,29 @@ session = Session()
 #######################################
 # https://wtforms.readthedocs.io/en/2.3.x/fields/
 class SearchForm(Form):
-    search1 = StringField(label="ID")
+    search1 = StringField(label="Request Title")
     search2 = StringField(label="RequestID")
     search3 = StringField(label="Requestor")
     search4 = StringField(label="Requestor Affiliation")
-
+    search5 = StringField(label="Assigned Analyst")
 
 class Results(Table):
-    id = Col('id')
-    requestId = Col('requestId')
-    dateSubmitted = Col('dateSubmitted')
-    dueDate = Col('dueDate')
-    rqstBy = Col('rqstBy')
-    rqstBy_title = Col('rqstBy_title')
-    rqstBy_affiliation = Col('rqstBy_affiliation')
+    #if rqstURL == "None" or not rqstURL:
+    rqstURL = Col('Request URL (or Title)')
+    #elif rqstTitle == "None" or not rqstTitle:
+    rqstTitle = Col('Request Title')
+    requestId = Col('Request Id')
+    dateSubmitted = Col('Date Submitted')
+    dueDate = Col('Due Date')
+    rqstBy = Col('Requested By')
+    rqstBy_title = Col('Requestor Title')
+    rqstBy_affiliation = Col('Requestor Affiliation')
+    rqstBy_phone = Col('Requestor Phone')
+    rqstBy_email = Col('Requestor Email')
+    assignedTo = Col('Assigned to')
+    rqstPrioity = Col('Request Priority')
+    rqstStatus = Col('Request Status')
+    form = ButtonCol('Form to Update Request', 'statusUpdateForm', url_kwargs=dict(form='requestId'))
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -201,19 +210,23 @@ def search():
 def search_results(search):
     results = []
     filters = []
-    id_input = search.data['search1']
+    title_input = search.data['search1']
     requestId_input = search.data['search2']
     requestor_input = search.data['search3']
     affiliation_input = search.data['search4']
-    if id_input:
-        filters.append(db_table.id.contains(id_input))
+    assignedto_input = search.data['search5']
+    filters.append((db_table.rqstStatus == 'Under Review') | (db_table.rqstStatus == "Received"))
+    if title_input:
+        filters.append(db_table.rqstURL.contains(title_input) | db_table.rqstBy_title.contains(title_input))
     if requestId_input:
         filters.append(db_table.requestId.contains(requestId_input))
     if requestor_input:
         filters.append(db_table.rqstBy.contains(requestor_input))
     if affiliation_input:
         filters.append(db_table.rqstBy_affiliation.contains(affiliation_input))
-    
+    if assignedto_input:
+        filters.append(db_table.assignedTo.contains(assignedto_input))
+
     results = session.query(db_table).filter(and_(*filters)).all()
     
     if not results:
@@ -330,7 +343,7 @@ def updateStatus():
 #########################################
 
 
-
+'''
 my_path = 'static/barGraphs/'
 
 # Export bar graph for each analyst to barGraphs folder
@@ -453,7 +466,7 @@ def plot_png():
     return Response(output.getvalue(), mimetype='image/png')
 """
 
-
+'''
 
 # URL Routes
 ###################################
@@ -640,7 +653,7 @@ def statusUpdate():
 
 
 
-@app.route('/statusUpdateForm')                                            
+@app.route('/statusUpdateForm', methods=['GET', 'POST'])                                            
 def statusUpdateForm():
 
     
