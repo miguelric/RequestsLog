@@ -10,6 +10,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.automap import automap_base
 from wtforms import Form, StringField, SelectField
 from flask_table import Table, Col, ButtonCol
+from flask_table.html import element
+import re
 ###################
 import pandas as pd
 import pyodbc
@@ -48,14 +50,14 @@ app = Flask(__name__)
 app.secret_key = '123' 
 
 # Connect to DB using pyodbc to get all data into a list
-cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV;""Database=IR_dataRequests;""Trusted_Connection=yes;")
+cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};""Server=BISERVDEV;""Database=OIR_WebData;""Trusted_Connection=yes;")
 cursor = cnxn.cursor()
 #cursor.execute("SELECT * FROM dbo.requests")
 
 
 
 # Fetch ALL requests that are open (assignedRequests.html)
-cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received';")
 
 
 
@@ -67,35 +69,35 @@ for row in cursor.fetchall():
 
 
 #Fetch ALL requests that are open this WEEK (dueThisWeek.html)
-#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND dueDate >= '"+ startDate + "' and dueDate <= '"+ endDate +"'")
+#cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received' AND Req_Due_Date >= '"+ startDate + "' and Req_Due_Date <= '"+ endDate +"'")
 
 
 thisWeekDict = []
 for row in cursor.fetchall():
     thisWeekDict.append(row)
 
-#cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Open' AND WHERE A;")
+#cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Open' AND WHERE A;")
 
 
 
 # Connect to DB using SQLAlchem in order to use Pandas
-engine = sa.create_engine('mssql+pyodbc://BISERVDEV/IR_dataRequests?driver=SQL Server Native Client 11.0?Trusted_Connection=yes').connect()
+engine = sa.create_engine('mssql+pyodbc://BISERVDEV/OIR_WebData?driver=SQL Server Native Client 11.0?Trusted_Connection=yes').connect()
 
 
-temp = pd.read_sql_table('requests', engine)            
+temp = pd.read_sql_table('_requests', engine)            
 temp = pd.DataFrame(temp)
 #print(temp) 
 
 
 
-uniqueNames =  temp['assignedTo'].unique()                         # Find unique analyst names (currently doesnt work bc of extra analyst names in db)
+uniqueNames =  temp['ASSIGNED_TO'].unique()                         # Find unique analyst names (currently doesnt work bc of extra analyst names in db)
 uniqueNames = ['Ashwin Jayagopal', 'Brian Cordeau', 'Fikrewold Bitew', 'Francisco Benavides', "Jinny Case", 'Lauren Apgar', 'Mahmoud Abunawas', 'Peter Nguyen', 'Scott Lehrman', 'Shanna Sherwood']
 numofAnalysts = len(uniqueNames)
 
 
 
-#weekly = temp[temp['dueDate'].between(startDate, endDate)]                 # Use after database is updated
-#weekly = temp[temp['dueDate'].between('2010-04-12', '2018-06-12')]
+#weekly = temp[temp['Req_Due_Date'].between(startDate, endDate)]                 # Use after database is updated
+#weekly = temp[temp['Req_Due_Date'].between('2010-04-12', '2018-06-12')]
 
 
 # Obtain how many tasks this week , next week and later on for each analyst
@@ -104,12 +106,12 @@ myDict = {}
 for x in uniqueNames:
     
     tasks = []
-    analyst = temp.loc[temp['assignedTo'] == x]
+    analyst = temp.loc[temp['ASSIGNED_TO'] == x]
     total = len(analyst)
 
-    week = analyst.loc[analyst['dueDate'].between('2010-04-12', '2018-06-12', inclusive=False)]
+    week = analyst.loc[analyst['Req_Due_Date'].between('2010-04-12', '2018-06-12', inclusive=False)]
     tasks.append(len(week))
-    nextWeek = analyst.loc[analyst['dueDate'].between('2018-06-12', '2019-06-12', inclusive=False)]
+    nextWeek = analyst.loc[analyst['Req_Due_Date'].between('2018-06-12', '2019-06-12', inclusive=False)]
     tasks.append(len(nextWeek))
     tasks.append(total - tasks[0]- tasks[1])
     myDict[x] = tasks
@@ -121,12 +123,12 @@ for x in uniqueNames:
 for x in uniqueNames:
       
     tasks = []
-    analyst = temp.loc[temp['assignedTo'] == x]
+    analyst = temp.loc[temp['ASSIGNED_TO'] == x]
     total = len(analyst)
 
-    week = analyst.loc[analyst['dueDate'].between(startDate, endDate, inclusive=False)]
+    week = analyst.loc[analyst['Req_Due_Date'].between(startDate, endDate, inclusive=False)]
     tasks.append(len(week))
-    nextWeek = analyst.loc[analyst['dueDate'].between(endDate, nextWeek, inclusive=False)]
+    nextWeek = analyst.loc[analyst['Req_Due_Date'].between(endDate, nextWeek, inclusive=False)]
     tasks.append(len(nextWeek))
     tasks.append(total - tasks[0]- tasks[1])
     myDict[x] = tasks
@@ -158,9 +160,9 @@ Session = sessionmaker(bind=engine)
 Base = automap_base()
 
 class db_table(Base): 
-#    __table__ = Base.metadata.tables['requests']
-    __tablename__ = 'requests'
-    requestId = Column(String, primary_key=True)
+#    __table__ = Base.metadata.tables['_requests']
+    __tablename__ = '_requests'
+    Key = Column(String, primary_key=True)
 
 Base.prepare(engine, reflect=True)
 session = Session()
@@ -174,28 +176,54 @@ session = Session()
 # https://wtforms.readthedocs.io/en/2.3.x/fields/
 class SearchForm(Form):
     search1 = StringField(label="Request Title")
-    search2 = StringField(label="RequestID")
+    search2 = StringField(label="Request ID")
     search3 = StringField(label="Requestor")
     search4 = StringField(label="Requestor Affiliation")
     search5 = StringField(label="Assigned Analyst")
 
+class PriorityCol(Col):
+    def td_format(self, content):
+        # fetch the priority code descriptions from the priorityCode table
+        cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
+        x = []
+        for row in cursor.fetchall():
+            x.append(row)
+        
+        if content != None:
+            xpcidog = content
+            xpcid = xpcidog.strip()
+            for pc in x:
+                if xpcid == pc[0].strip():
+                    priorityCodeWord = pc[1].strip()
+        return priorityCodeWord
+
+class ExternalURLCol(Col):
+    def td_format(self, content):
+        #url = re.escape(content)
+        url = content
+        url = url.replace("I:\\", "\\\\Utsarr.net\\utfile\\USERS\\")
+        print(url)
+        return element('a', attrs=dict(href=url), content=url)
+
+
 class Results(Table):
-    #if rqstURL == "None" or not rqstURL:
-    rqstURL = Col('Request URL (or Title)')
-    #elif rqstTitle == "None" or not rqstTitle:
-    rqstTitle = Col('Request Title')
-    requestId = Col('Request Id')
-    dateSubmitted = Col('Date Submitted')
-    dueDate = Col('Due Date')
-    rqstBy = Col('Requested By')
-    rqstBy_title = Col('Requestor Title')
-    rqstBy_affiliation = Col('Requestor Affiliation')
-    rqstBy_phone = Col('Requestor Phone')
-    rqstBy_email = Col('Requestor Email')
-    assignedTo = Col('Assigned to')
-    rqstPrioity = Col('Request Priority')
-    rqstStatus = Col('Request Status')
-    form = ButtonCol('Form to Update Request', 'statusUpdateForm', url_kwargs=dict(form='requestId'))
+    #if Req_URL == "None" or not Req_URL:
+    Req_URL = Col('Request Title (or URL)')
+    #elif TITLE == "None" or not TITLE:
+    TITLE = Col('Request Title')
+    Key = Col('Request Id')
+    Date_Submitted = Col('Date Submitted')
+    Req_Due_Date = Col('Due Date')
+    Req_Name = Col('Requested By')
+    Req_Title = Col('Requestor Title')
+    Req_Affiliation = Col('Requestor Affiliation')
+    Req_Phone = Col('Requestor Phone')
+    Req_Email = Col('Requestor Email')
+    ASSIGNED_TO = Col('Assigned to')
+    PRIORITY = PriorityCol('Priority')
+    REQ_STATUS = Col('Request Status')
+    FOLDER_LOCATION = ExternalURLCol('Folder Location')
+    form = ButtonCol('Form to Update Request', 'statusUpdateForm', url_kwargs=dict(form='Key'))
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -215,17 +243,17 @@ def search_results(search):
     requestor_input = search.data['search3']
     affiliation_input = search.data['search4']
     assignedto_input = search.data['search5']
-    filters.append((db_table.rqstStatus == 'Under Review') | (db_table.rqstStatus == "Received"))
+    filters.append((db_table.REQ_STATUS == 'Under Review') | (db_table.REQ_STATUS == "Received"))
     if title_input:
-        filters.append(db_table.rqstURL.contains(title_input) | db_table.rqstBy_title.contains(title_input))
+        filters.append(db_table.Req_URL.contains(title_input) | db_table.Req_Title.contains(title_input))
     if requestId_input:
-        filters.append(db_table.requestId.contains(requestId_input))
+        filters.append(db_table.Key.contains(requestId_input))
     if requestor_input:
-        filters.append(db_table.rqstBy.contains(requestor_input))
+        filters.append(db_table.Req_Name.contains(requestor_input))
     if affiliation_input:
-        filters.append(db_table.rqstBy_affiliation.contains(affiliation_input))
+        filters.append(db_table.Req_Affiliation.contains(affiliation_input))
     if assignedto_input:
-        filters.append(db_table.assignedTo.contains(assignedto_input))
+        filters.append(db_table.ASSIGNED_TO.contains(assignedto_input))
 
     results = session.query(db_table).filter(and_(*filters)).all()
     
@@ -235,6 +263,7 @@ def search_results(search):
         return redirect('/search')
     else:
         # display results
+        #print(results)
         table = Results(results)
         table.border = True
         return render_template('results.html', results=results, table=table)
@@ -262,34 +291,34 @@ def updateUnassigned():
     # Find the record in the database matching the request ID
 
     # Unexpected behavior?
-    #session.query(db_table).filter(db_table.requestId == 'formID').updateUnassigned({'assignedTo': newAssignedAnalyst})
+    #session.query(db_table).filter(db_table.Key == 'formID').updateUnassigned({'ASSIGNED_TO': newAssignedAnalyst})
     
     
-    row = session.query(db_table).filter_by(requestId = formID).one()
+    row = session.query(db_table).filter_by(Key = formID).one()
     
     if newAssignedAnalyst == "None" or not newAssignedAnalyst:
         row.assignedTo = None
     else:
-        row.assignedTo = newAssignedAnalyst
+        row.ASSIGNED_TO = newAssignedAnalyst
     
     if newStatus == "None" or not newStatus:
-        row.rqstStatus = None
+        row.REQ_STATUS = None
     else:
-        row.rqstStatus = newStatus
+        row.REQ_STATUS = newStatus
     
     if newPriority == "None" or not newPriority:
-        row.rqstPrioity = None
+        row.PRIORITY = None
     else:
-        row.rqstPrioity = newPriority
+        row.PRIORITY = newPriority
     
     if newNotes == "None" or not newNotes:
-        row.notes = None
+        row.NOTE = None
     else:
-        row.notes = newNotes
+        row.NOTE = newNotes
     
     session.add(row)
     '''
-    sql = "UPDATE requests SET assignedTo = ?, notes = ? WHERE requestID = ?"
+    sql = "UPDATE _requests SET ASSIGNED_TO = ?, NOTE = ? WHERE Key = ?"
     cursor.execute(sql, newAssignedAnalyst, newNotes, formID)
     '''
     session.commit()
@@ -307,32 +336,32 @@ def updateStatus():
     newDeadline = request.form.get("newDeadline")
     newNotes = request.form.get("newNotes")
     
-    row = session.query(db_table).filter_by(requestId = formID).one()
+    row = session.query(db_table).filter_by(Key = formID).one()
     
 
     if newStatus == "None" or not newStatus:
-        row.rqstStatus = None
+        row.REQ_STATUS = None
     else:
-        row.rqstStatus = newStatus
+        row.REQ_STATUS = newStatus
     
     if newPriority == "None" or not newPriority:
-        row.rqstPrioity = None
+        row.PRIORITY = None
     else:
-        row.rqstPrioity = newPriority
+        row.PRIORITY = newPriority
     
     if newDeadline == "None" or not newDeadline:
-        row.dueDate = None
+        row.Req_Due_Date = None
     else:
-        row.dueDate = newDeadline
+        row.Req_Due_Date = newDeadline
     
     if newNotes == "None" or not newNotes:
-        row.notes = None
+        row.NOTE = None
     else:
-        row.notes = newNotes
+        row.NOTE = newNotes
     
     session.add(row)
     '''
-    sql = "UPDATE requests SET assignedTo = ?, notes = ? WHERE requestID = ?"
+    sql = "UPDATE _requests SET ASSIGNED_TO = ?, NOTE = ? WHERE Key = ?"
     cursor.execute(sql, newAssignedAnalyst, newNotes, formID)
     '''
     session.commit()
@@ -487,25 +516,25 @@ def homepage():
 def assignedRequests():
 
     # fetch ALL requests that are received (assignedRequests.html)
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received';")
     db = []
     for row in cursor.fetchall():
         db.append(row)
 
     # fetch ALL requests that are under review (assignedRequests.html)
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Under Review';")
     reviewdb = []
     for row in cursor.fetchall():
         reviewdb.append(row)
 
     # fetch ALL the analysts from the assignedTo table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
 
     # fetch the priority code descriptions from the priorityCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
@@ -519,25 +548,25 @@ def assignedRequests():
 def unassigned():
 
     # fetch ALL requests that are received
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received';")
     db = []
     for row in cursor.fetchall():
         db.append(row)
 
     # fetch ALL the analysts from the assignedTo table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
 
     # fetch ALL requests that are under review AND received
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' OR rqstStatus = 'Received';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Under Review' OR REQ_STATUS = 'Received';")
     db_and_reviewdb = []
     for row in cursor.fetchall():
         db_and_reviewdb.append(row)
 
     # fetch the priority code descriptions from the priorityCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
@@ -549,7 +578,7 @@ def unassigned():
 def unassignedForm():
 
     # fetch ALL requests that are received
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received';")
     db = []
     for row in cursor.fetchall():
         db.append(row)
@@ -557,19 +586,19 @@ def unassignedForm():
     formID = request.args.get('form')
  
     # fetch ALL the analysts from the assignedTo table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
 
     # fetch the priority code descriptions from the priorityCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
 
     # fetch the status code descriptions from the statusCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[statusCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[statusCode]")
     statusdb = []
     for row in cursor.fetchall():
         statusdb.append(row)
@@ -582,13 +611,13 @@ def unassignedForm():
 def dueThisWeek():
 
     # fetch ALL requests that are received
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received';")
     db = []
     for row in cursor.fetchall():
         db.append(row)
 
     # fetch ALL the analysts from the assignedTo table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
@@ -597,19 +626,19 @@ def dueThisWeek():
     #print(current_date)
 
     # fetch the requests with "Received" status that are due in some range from current date/time
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received' AND DATEDIFF(DAY, dueDate, GETDATE()) >= 0 AND DATEDIFF(DAY, dueDate, GETDATE()) <= 900;")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received' AND DATEDIFF(DAY, Req_Due_Date, GETDATE()) >= 0 AND DATEDIFF(DAY, Req_Due_Date, GETDATE()) <= 900;")
     due_this_week_db = []
     for row in cursor.fetchall():
         due_this_week_db.append(row)
     
     # fetch the requests with "Under Review" status that are due in some range from current date/time
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' AND DATEDIFF(DAY, dueDate, GETDATE()) >= 0 AND DATEDIFF(DAY, dueDate, GETDATE()) <= 900;")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Under Review' AND DATEDIFF(DAY, Req_Due_Date, GETDATE()) >= 0 AND DATEDIFF(DAY, Req_Due_Date, GETDATE()) <= 900;")
     due_this_week_reviewdb = []
     for row in cursor.fetchall():
         due_this_week_reviewdb.append(row)
 
     # fetch the priority code descriptions from the priorityCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
@@ -624,26 +653,26 @@ def dueThisWeek():
 def statusUpdate():
 
     # fetch ALL requests that are received
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Received';")
     db = []
     for row in cursor.fetchall():
         db.append(row)
 
     # fetch ALL requests that are under review
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Under Review';")
     reviewdb = []
     for row in cursor.fetchall():
         reviewdb.append(row)
 
 
     # fetch ALL the analysts from the assignedTo table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
 
     # fetch the priority code descriptions from the priorityCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
@@ -660,19 +689,19 @@ def statusUpdateForm():
     formID = request.args.get('form')
 
     # fetch ALL requests that are under review AND received
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review' OR rqstStatus = 'Received';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Under Review' OR REQ_STATUS = 'Received';")
     db_and_reviewdb = []
     for row in cursor.fetchall():
         db_and_reviewdb.append(row)
  
     # fetch the priority code descriptions from the priorityCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
 
     # fetch the status code descriptions from the statusCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[statusCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[statusCode]")
     statusdb = []
     for row in cursor.fetchall():
         statusdb.append(row)
@@ -685,19 +714,19 @@ def statusUpdateForm():
 def completedRequests():
 
     # fetch ALL requests that are COMPLETED
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Completed';")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[_requests] WHERE REQ_STATUS = 'Completed';")
     completeddb = []
     for row in cursor.fetchall():
         completeddb.append(row)
 
     # fetch ALL the analysts from the assignedTo table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[assignedTo]")
     analystList = []
     for row in cursor.fetchall():
         analystList.append(row)
 
     # fetch the priority code descriptions from the priorityCode table
-    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    cursor.execute("SELECT * FROM [OIR_WebData].[dbo].[priorityCode]")
     prioritydb = []
     for row in cursor.fetchall():
         prioritydb.append(row)
