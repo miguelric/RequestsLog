@@ -99,23 +99,27 @@ To show how it looks so you get the feel, the *first* row of the dbo.requests ta
 
 By default, the items will be sorted so that the highest id will be at the top, but you can sort the items however using Python's `sorted()`; this is done in the individual html pages. Reference on sorting: https://jinja.palletsprojects.com/en/2.11.x/templates/#sort
 
-The following code shows how the function will pass the two lists representing rows in the dbo.assignedTo table and dbo.requests to `assignedRequests.html` template (well, and a third list `df`, which at this time was used for working with graphs). It will then return the rendered version. 
+The following code shows how the function will pass the two lists representing rows in the dbo.assignedTo table and dbo.requests to `assignedRequests.html` template. It will then return the rendered version. 
 
-Specifically, the two tables are dbo.requests and dbo.assignedTo. `SELECT *` will select all columns (though this may produce some unnecessary network load/query performance problems - it may be replaced by an explicit column list, but we need not worry about it now).
+Specifically, the four tables are dbo.requests where the request status is received, dbo.requests where the request status is under review, dbo.assignedTo, and dbo.priorityCode. `SELECT *` will select all columns (though this may produce some unnecessary network load/query performance problems - it may be replaced by an explicit column list, but we need not worry about it now).
 
 The `fetchall()` method will fetch all (or all remaining) rows of the query result set and returns a list of tuples.
 
 ```
-@app.route('/assignedRequests')                                                   
+@app.route('/assignedRequests')
 def assignedRequests():
 
+    # fetch ALL requests that are received (assignedRequests.html)
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Received';")
-    dic = []
+    db = []
     for row in cursor.fetchall():
-        dic.append(row)
+        db.append(row)
 
-    df = uniqueNames
-    db = dic
+    # fetch ALL requests that are under review (assignedRequests.html)
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[requests] WHERE rqstStatus = 'Under Review';")
+    reviewdb = []
+    for row in cursor.fetchall():
+        reviewdb.append(row)
 
     # fetch ALL the analysts from the assignedTo table
     cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[assignedTo]")
@@ -123,7 +127,15 @@ def assignedRequests():
     for row in cursor.fetchall():
         analystList.append(row)
 
-    return render_template("assignedRequests.html", df = df, db = db, analystList = analystList)
+    # fetch the priority code descriptions from the priorityCode table
+    cursor.execute("SELECT * FROM [IR_dataRequests].[dbo].[priorityCode]")
+    prioritydb = []
+    for row in cursor.fetchall():
+        prioritydb.append(row)
+
+
+    return render_template("assignedRequests.html", db = db, reviewdb = reviewdb, analystList = analystList, prioritydb = prioritydb)
+
 ```
 
 ---
