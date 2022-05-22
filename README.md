@@ -445,4 +445,4 @@ Refer to the NOTES under [**Unassigned Requests** section](#s8) regarding handli
 
 Christina Zhang - Email: christina.zhang@utsa.edu
 
-Miguel Rico
+Miguel Rico - Email: miguel.rico@utsa.edu
